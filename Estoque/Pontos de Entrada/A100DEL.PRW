@@ -1,0 +1,110 @@
+#include "Rwmake.ch"
+#include "Protheus.ch"
+
+/*
+////////////////////////////////////////////////////////////////////////////////////
+//Programa: A100DEL - VALIDA A EXCLUSÃO DA NF ENTRADA
+//Autoria : Flávia Rocha
+//Data    : 24/05/2011           
+//Solicitado no chamado 002110 - Deise
+//Descrição: 	Por favor, permitir apenas para exclusão de NF de entrada
+// e pre nota os usuarios Deise,Regina,João Emanuel e Alexandre Xavier,
+// e se possível deixar registrado o usuario que excluiu a mesma(NF).Obrigada 
+/////////////////////////////////////////////////////////////////////////////////////
+*/
+************************
+User Function A100DEL() 
+************************
+/*
+
+Local lOk :=alltrim(Upper( Substr( cUsuario, 7, 15 ) ) ) $ "ADMIN/DEISE/REGINA/ALEXANDRE/JOAO EMANUEL"  
+//Local lOk := .T.
+
+if !lOK
+   Alert("Somente Regina, Deise, Alexandre Xavier ou João Emanuel, poderão cancelar Notas.")
+endif
+
+
+If lOk
+	_nIndD1 := SD1->( IndexOrd() )
+	_nRecD1 := SD1->( Recno() )
+	_nIndB1 := SB1->( IndexOrd() )
+	_nRecB1 := SB1->( Recno() )
+	_nRecF4 := SF4->( Recno() )
+	
+	
+	If SM0->M0_CODIGO == "02" .and. SF1->F1_TIPO == "D"
+		
+		SD1->( DbSetOrder( 1 ) )
+		SD1->( DbSeek( SF1->F1_FILIAL + SF1->F1_DOC + SF1->F1_SERIE + SF1->F1_FORNECE + SF1->F1_LOJA, .T. ) )
+		
+		
+		Do while SD1->D1_FORNECE + SD1->D1_LOJA + SD1->D1_SERIE + SD1->D1_DOC == SF1->F1_FORNECE + SF1->F1_LOJA + SF1->F1_SERIE + SF1->F1_DOC
+			
+			SF4->(DbSetOrder(1))
+			SF4->(DbSeek(xFilial("SF4")+SD1->D1_TES) )
+			if SF4->F4_ESTOQUE = 'S'			
+				If Len( AllTrim( SD1->D1_COD ) ) >= 8
+					SB1->( DbSetOrder( 1 ) )
+					SB1->( DbSeek( xFilial("SB1") + SD1->D1_COD ) )
+					nPESO := SB1->B1_PESOR
+					lMsErroAuto := .T.
+					Do While lMsErroAuto
+						
+						lMsErroAuto := .F.
+						aMATRIZ     := { { "D3_TM", "003", NIL},;
+						{ "D3_DOC", NextNumero( "SD3", 2, "D3_DOC", .T. ), NIL},;
+						{ "D3_FILIAL", xFilial( "SD3" ), NIL},;
+						{ "D3_LOCAL", "01", NIL },;
+						{ "D3_COD", SD1->D1_COD, NIL},;
+						{ "D3_QUANT", SD1->D1_QUANT, NIL },;
+						{ "D3_EMISSAO", dDATABASE, NIL} }
+						
+						//   Begin Transaction
+						MSExecAuto( { | x, y | MATA240( x, y ) }, aMATRIZ, 3 )
+						//      IF lMsErroAuto
+						//        DisarmTransaction()
+						//      Endif
+						//   End Transaction
+					EndDo
+					cCODSECU := If( Len( AllTrim( SD1->D1_COD ) ) = 8, SUBS( SD1->D1_COD, 1, 1 ) + SUBS( SD1->D1_COD, 3, 3 ) +;
+					SUBS( SD1->D1_COD, 7, 2 ), SUBS( SD1->D1_COD, 1, 1 ) + SUBS( SD1->D1_COD, 3, 4 ) +;
+					SUBS( SD1->D1_COD, 8, 2 ) )
+					
+					SB1->( DbSeek( xFilial("SB1") + cCODSECU ) )
+					
+					lMsErroAuto := .T.
+					Do While lMsErroAuto
+						lMsErroAuto := .F.
+						aMATRIZ     := { { "D3_TM", "503", NIL},;
+						{ "D3_DOC", NextNumero( "SD3", 2, "D3_DOC", .T. ), NIL},;
+						{ "D3_FILIAL", xFilial( "SD3" ),Nil},;
+						{ "D3_LOCAL", "01", NIL },;
+						{ "D3_COD", cCODSECU, NIL},;
+						{ "D3_QUANT", SD1->D1_QUANT, NIL },;
+						{ "D3_EMISSAO", dDATABASE, NIL} }
+						
+						//      Begin Transaction
+						MSExecAuto( { | x, y | MATA240( x, y ) }, aMATRIZ, 3 )
+						//        IF lMsErroAuto
+						//            DisarmTransaction()
+						//         Endif
+						//      End Transaction
+					EndDo
+				EndIf
+			endif
+			SD1->( dbSkip() )
+		EndDo
+		
+	endif
+	
+	SD1->( DbSetOrder( _nINDD1 ) )
+	SD1->( DbGoto( _nRECD1 ) )
+	SB1->( DbSetOrder( _nINDB1 ) )
+	SB1->( DbGoto( _nRECB1 ) )
+	SF4->( DbGoto( _nRECF4 ) )
+
+Endif
+*/
+
+Return .T. //lOk

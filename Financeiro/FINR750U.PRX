@@ -1,0 +1,916 @@
+//#INCLUDE "FINR750.CH"
+#include "PROTHEUS.CH"
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡„o    ³ FINR750  ³ Autor ³ Wagner Xavier         ³ Data ³ 08.05.96 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡„o ³ Eficiˆncia da Cobran‡a.                                    ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Sintaxe e ³ FINR750(void)                                              ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ Generico                                                   ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+User Function FINR750U()
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Define Variaveis                                             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+LOCAL wnrel
+LOCAL cString := "SE1"
+LOCAL cDesc1  := "Este programa ir  emitir um resumo referente ao contas a receber"
+LOCAL cDesc2  := "referente aos ultimos 30 dias."
+LOCAL cDesc3  := ""
+LOCAL tamanho := "G"
+LOCAL cData   := DtoC(dDataBase)
+//LOCAL cData   := DtoC(MV_PAR12)
+
+PRIVATE titulo   := OemToAnsi("EFICIENCIA DO CONTAS A RECEBER")  //
+PRIVATE aReturn  := { OemToAnsi("Zebrado"), 1,OemToAnsi("Administracao"), 2, 2, 1, "",1 }  //###
+PRIVATE nomeprog :="FINR750"
+PRIVATE cPerg    :="FIN750"
+PRIVATE nLastKey := 0
+PRIVATE nJuros   := 0
+//Incluir parametros para informação de data de vencimento
+//as colunas serão ate o percentual recebido, as demais retirar
+PRIVATE cabec1   := OemToAnsi("DATA          VALOR DOS          VALORES RECEBIDOS SEM ATRASO             VALORES RECEBIDOS COM ATRASO        VALOR NAO PAGO  %RECEBI  SALDO PENDENTE    SALDO") 
+PRIVATE cabec2   := OemToAnsi("VENCTO          TITULOS     DESCONTO /  ACRESCIMO / TOTAL RECEBIDO    DESCONTO / ACRESCIMO / TOTAL RECEBIDO   DO DIA NO VCTO  S/ATRAS  EM ")+cData+"       (%)"  //###
+PRIVATE cTipos   := ""
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Defini‡„o dos cabe‡alhos                                     ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+titulo := OemToAnsi("Eficiencia do Contas a Receber")  //
+
+//Ponto de entrada pela Microsiga
+If ExistBlock("FR750TIT")
+	ExecBlock("FR750TIT",.F.,.F.,Titulo)
+Endif
+
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica as perguntas selecionadas                         ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+pergunte("FIN750",.F.)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para parametros                        ³
+//³ mv_par01            // Prefixo de                           ³
+//³ mv_par02            // Prefixo ate                          ³
+//³ mv_par03            // Natureza de                          ³
+//³ mv_par04            // Natureza ate                         ³
+//³ mv_par05            // Seleciona tipos                      ³
+//³ mv_par06            // Considera data base                  ³
+//³ mv_par07            // Qual Moeda                           ³
+//³ mv_par08            // Outras Moedas                        ³
+//³ mv_par09            // Da Filial Origem                     ³
+//³ mv_par10            // Até Filial Origem                    ³
+
+//³ mv_par11            // Data de Inicio //Eurivan             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Envia controle para a funcao SETPRINT                       ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+wnrel:="FINR750"            //Nome Default do relatorio em Disco
+wnrel:=SetPrint(cString,wnrel,cPerg,@titulo,cDesc1,cDesc2,cDesc3,.F.,"",,tamanho,"",.f.)
+
+If nLastKey == 27
+	Return
+Endif
+
+SetDefault(aReturn,cString)
+
+If nLastKey == 27
+	Return
+Endif
+
+RptStatus({|lEnd| Fa750Imp(@lEnd,wnRel,cString)},titulo)
+Return
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡„o    ³ FINR750  ³ Autor ³ Wagner Xavier         ³ Data ³ 08.05.96 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡„o ³ Eficiencia da Cobranca.                                    ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Sintaxe e ³ FA750Imp(lEnd,wnRel,cString)                               ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³ Parametro 1 - lEnd    - A‡Æo do CodeBlock                  ³±±
+±±³          ³ Parametro 2 - wnRel   - T¡tulo do relat¢rio                ³±±
+±±³          ³ Parametro 3 - cString - Mensagem                           ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³ Generico                                                   ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Static Function FA750Imp(lEnd,wnRel,cString)
+LOCAL CbCont,CbTxt
+LOCAL tamanho:="G"
+LOCAL cNomeArq
+LOCAL aCampos
+LOCAL nDias, dDtSeek, dDtPagto
+LOCAL i
+LOCAL nValorSe5, nTValorE := 0
+LOCAL nValorTitulo   := 0
+LOCAL nTotValB:=0
+LOCAL nTotValG:=0
+LOCAl lFirst  := .T.
+LOCAL cChaveSe1
+LOCAL nIndexSe1
+LOCAL cIndexSe1
+LOCAL cChaveSe5
+LOCAL cIndexSe5
+LOCAL nTotAbat := 0
+LOCAL nTotDescoA:=0
+LOCAL nTotAcresA:=0
+LOCAL nTotValorC:=0
+LOCAL nTotDescoB:=0
+LOCAL nTotAcresB:=0
+LOCAL nTotValorD:=0
+LOCAL nTotPgtdi_h:=0
+LOCAL nTotBaixa :=0
+LOCAL nTotNoCred:=0
+LOCAL lAnterior :=.f.
+#IFDEF TOP
+	Local aStruArq	:= SE1->(dbStruct()), ni, cOrder
+//	LOCAL dDtLimite := dDataBase + 30
+	LOCAL dDtLimite := dDataBase + (dDataBase-MV_PAR11)
+//	LOCAL dDtLimite := MV_PAR12 + (MV_PAR12-MV_PAR11)
+#ENDIF	
+Local nValAdto := 0
+Local cFilterUser := aReturn[7]
+Local nMoeda    := mv_par07
+LOCAL nDecs     := MsDecimais(mv_par07)
+LOCAL nMoedaBco	:= 1                                   
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Variaveis utilizadas para Impressao do Cabecalho e Rodape    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+cbtxt    := SPACE(10)
+cbcont   := 0
+li       := 80
+m_pag    := 1
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica se seleciona tipos para total faturamento         ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+If mv_par05 == 1
+	finaTipos()
+Endif
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Monta Query para TOP no SE1                                ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+#IFDEF TOP
+	dbSelectArea("SE1")
+	dbSetOrder(1)	
+	cChaveSe1:= IndexKey()
+	cOrder 	:= SqlOrder(cChaveSe1)
+	If TcSrvType() != "AS/400"
+		cQuery := "SELECT * "
+		cQuery += " FROM " + RetSqlName("SE1")
+		cQuery += " WHERE E1_FILIAL = '" + xFilial("SE1") + "'"
+		cQuery += " AND D_E_L_E_T_ <> '*' "
+		cQuery += " AND E1_NATUREZ between '" + mv_par03        + "' AND '" + mv_par04       + "'"
+		cQuery += " AND E1_PREFIXO between '" + mv_par01        + "' AND '" + mv_par02       + "'"
+		cQuery += " AND E1_FILORIG between '" + mv_par09        + "' AND '" + mv_par10       + "'"
+		cQuery += " AND E1_TIPO <> '" + MV_CRNEG	+ "'"
+		cQuery += " AND E1_TIPO <> '" + MVRECANT	+ "'"
+		cQuery += " AND E1_TIPO <> '" + MVPROVIS	+ "'"
+		cQuery += " AND E1_TIPO NOT LIKE '%-' "
+//		cQuery += " AND E1_EMISSAO <= '" + DTOS(dDataBase) + "'"
+//		cQuery += " AND E1_VENCREA <= '" + DTOS(dDatabase) + "'"	
+
+
+		cQuery += " AND E1_EMISSAO <= '" + DTOS(MV_PAR12) + "'"
+		cQuery += " AND E1_VENCREA <= '" + DTOS(MV_PAR12) + "'"	
+
+		cQuery += " ORDER BY " + cOrder
+	
+		cQuery := ChangeQuery(cQuery)
+
+		dbSelectAre("SE1")
+		dbCloseArea()
+
+		dbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery), 'SE1', .T., .T.)
+	
+		For ni := 1 to Len(aStruArq)
+			If aStruArq[ni,2] != 'C'
+				TCSetField('SE1', aStruArq[ni,1], aStruArq[ni,2],aStruArq[ni,3],aStruArq[ni,4])
+			Endif
+		Next
+	Else	
+		cIndexSe1 := CriaTrab(nil,.f.)
+		cChaveSe1 := IndexKey()
+		IndRegua("SE1",cIndexSe1,cChaveSe1,,Fr750Chec1(),OemToAnsi("Selecionando Registros..."))  //
+		nIndexSE1 := RetIndex("SE1")
+		dbSetOrder(nIndexSe1+1)
+	EndIf
+#ELSE
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Cria IndRegua com filtragem do SE1                           ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	cIndexSe1 := CriaTrab(nil,.f.)
+	cChaveSe1 := IndexKey()
+	IndRegua("SE1",cIndexSe1,cChaveSe1,,Fr750Chec1(),OemToAnsi("Selecionando Registros..."))  //
+	nIndexSE1 := RetIndex("SE1")
+	#IFNDEF TOP
+		dbSetIndex(cIndexSe1+OrdBagEXt())
+	#ENDIF
+	dbSetOrder(nIndexSe1+1)
+	dbSelectArea("SE1")
+	dbSeek(cFilial)
+#ENDIF	
+
+SetRegua(SE1->(RecCount())+SE5->(RecCount()))
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Cria arquivo de trabalho                                     ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+aCampos:={  {"D_DATA"  ,"D", 8,0},;
+		    {"VALOR_B" ,"N",17,2},;
+			{"VALOR_C" ,"N",17,2},;
+			{"VALOR_D" ,"N",17,2},;
+			{"VALOR_E" ,"N",17,2},;
+			{"VALOR_F" ,"N",17,2},;
+			{"VALOR_G" ,"N",17,2},;
+			{"DESCO_A" ,"N",17,2},;
+			{"ACRES_A" ,"N",17,2},;
+			{"DESCO_B" ,"N",17,2},;
+			{"ACRES_B" ,"N",17,2}}
+			
+//			{"PGTDI_H" ,"N",17,2},;
+//			{"BAIXADIA","N",17,2},;
+//			{"NOCREDIT","N",17,2} }
+
+cNomeArq:=CriaTrab(aCampos)
+dbUseArea( .T.,, cNomeArq, "cNomeArq", if(.F. .OR. .F., !.F., NIL), .F. )
+IndRegua("cNomeArq",cNomeArq,"DtoS(D_DATA)",,,OemToAnsi("Selecionando Registros..."))  //
+dbCommit()
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Le contas a receber para montar arquivo de trabalho          ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("SE1")
+#IFDEF TOP
+	If TcSrvType() == "AS/400"
+		dbSeek( cFilial )
+	Endif
+#ELSE
+	dbSeek( cFilial )
+#ENDIF
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Le contas a receber para montar arquivo de trabalho          ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+While !Eof() .and. E1_FILIAL == cFilial
+	
+	IncRegua()
+	
+	IF lEnd
+		@PROW()+1,001 PSAY OemToAnsi("CANCELADO PELO OPERADOR")  //
+		Exit
+	Endif
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Considera filtro do usuario                                  ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If !Empty(cFilterUser).and.!(&cFilterUser)
+		dbSkip()
+		Loop
+	Endif
+		
+	#IFNDEF TOP	
+		If !Fr750Skip()
+			dbSkip()
+			Loop
+		EndIf	
+	#ELSE
+		If TcSrvType() != "AS/400"
+			If !Fr750Skip()
+				dbSkip()
+				Loop
+			EndIf					
+		EndIf	
+	#ENDIF
+
+    If mv_par08 == 2
+      If SE1->E1_MOEDA <> nMoeda
+         SE1->(DbSkip())
+         Loop
+      EndIf
+    EndIf    
+	
+	nTotAbat  := 0
+	nSaldoTit := 0
+	
+	If mv_par06 == 1
+		nSaldoTit:=SaldoTit(SE1->E1_PREFIXO,SE1->E1_NUM,SE1->E1_PARCELA,SE1->E1_TIPO,SE1->E1_NATUREZA,"R",SE1->E1_CLIENTE,1,,,,,If(cPaisLoc=="BRA",SE1->E1_TXMOEDA,0))
+		nSaldoTit:=Round(NoRound(nSaldoTit,3),2)
+		If nSaldoTit > 0
+			nTotAbat :=SomaAbat(SE1->E1_PREFIXO,SE1->E1_NUM,SE1->E1_PARCELA,"R",1,,SE1->E1_CLIENTE,SE1->E1_LOJA)
+			nSaldoTit-=nTotAbat
+		Endif
+	Else
+		nSaldoTit:=xMoeda((SE1->E1_SALDO+SE1->E1_SDACRES-SE1->E1_SDDECRE),SE1->E1_MOEDA,nMoeda,SE1->E1_EMISSAO,nDecs+1,If(cPaisLoc=="BRA",SE1->E1_TXMOEDA,0))
+		If nSaldoTit > 0
+			nTotAbat :=SomaAbat(SE1->E1_PREFIXO,SE1->E1_NUM,SE1->E1_PARCELA,"R",1,,SE1->E1_CLIENTE,SE1->E1_LOJA)
+			nSaldoTit-=nTotAbat
+		Endif
+	Endif
+	nSaldoTit:=Round(NoRound(nSaldotit,3),2)
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Anula os retroativos se nao considerar data base             ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If mv_par06 == 2 .AND. E1_SALDO = 0
+		nSaldoTit := 0
+	Endif
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Verifica se o atraso e' maior que 30 dias                    ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	dbSelectArea("cNomeArq")
+
+	//If (dDataBase - SE1->E1_VENCREA) > 30      //atrasados anterior
+	If (dDataBase - SE1->E1_VENCREA) > (dDataBase - MV_PAR11)  //atrasados anterior	
+//		If dbSeek(DtoS(dDataBase-31))
+		If dbSeek(DtoS(dDataBase-((dDataBase-MV_PAR11)+1) ))
+			Reclock("cNomeArq")
+		Else
+			Reclock("cNomeArq",.T.)
+		Endif
+//		cNomeArq->D_DATA  := dDataBase - 31      //grava anteriores com 31 dias
+		cNomeArq->D_DATA  := dDataBase - ((dDataBase-MV_PAR11)+1)      //grava anteriores com 31 dias
+		cNomeArq->VALOR_G += nSaldoTit           //saldo
+		MsUnlock()
+	Else
+		nDias := dDataBase - SE1->E1_VENCREA    // titulos do periodo
+		If cPaisLoc == "BRA"
+		   nValorTitulo := xMoeda(SE1->E1_VALOR,SE1->E1_MOEDA,1,,,SE1->E1_TXMOEDA)  // grava o valor original
+		Else   
+		   nValorTitulo := xMoeda(SE1->E1_VALOR,SE1->E1_MOEDA,nMoeda,SE1->E1_EMISSAO,nDecs+1)  // grava o valor original
+		EndIf   
+		If dbSeek(DtoS(dDataBase-nDias))
+			Reclock("cNomeArq")
+		Else
+			Reclock("cNomeArq",.T.)
+		Endif
+		cNomeArq->D_DATA  := (dDataBase - nDias )
+		cNomeArq->VALOR_B += nValorTitulo - nTotAbat      //valor original
+		cNomeArq->VALOR_G += nSaldoTit         //saldo em aberto
+		MsUnlock()
+	Endif
+	dbSelectArea("SE1")
+	dbSkip()
+Enddo
+
+#IFDEF TOP
+	if TcSrvType() != "AS/400"
+		dbSelectArea("SE1")
+		dbCloseArea()
+		ChKFile("SE1")
+	  	dbSelectArea("SE1")
+		dbSetOrder(1)
+	EndIf
+#ENDIF	
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Monta Query para TOP no SE5                                ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+#IFDEF TOP
+	If TcSrvType() != "AS/400"
+		dbSelectArea("SE5")
+		cChaveSe5 := IndexKey()
+		cOrder 	  := SqlOrder(cChaveSE5)
+//		dData	  := dDataBase - 33
+		dData	  := dDataBase - ( ( dDataBase - MV_PAR11 )+3 ) 
+		dDtPagto  := SE5->E5_DATA
+
+		cQuery := "SELECT * "
+		cQuery += " FROM " + RetSqlName("SE5") + " SE5 "
+		cQuery += " WHERE E5_FILIAL = '" + xFilial("SE5") + "'"
+		cQuery += " AND D_E_L_E_T_ <> '*' "
+		cQuery += " AND E5_TIPODOC IN ('VL','BA','V2','DC','JR','D2','J2','MT','M2','CM','C2','TL','RA') "
+		cQuery += " AND E5_NATUREZ between '" + mv_par03        + "' AND '" + mv_par04       + "'"
+		cQuery += " AND E5_PREFIXO between '" + mv_par01        + "' AND '" + mv_par02       + "'"
+		cQuery += " AND E5_FILORIG between '" + mv_par09        + "' AND '" + mv_par10       + "'"
+		cQuery += " AND E5_RECPAG = 'R' "
+		cQuery += " AND E5_DTDISPO >= '" + DTOS(dData) + "'"
+		cQuery += " AND (E5_DTDISPO <= '" + DTOS(dDtLimite) + "' )"
+		cQuery += " AND NOT EXISTS (SELECT E5_TIPODOC FROM " 
+		cQuery +=   RetSqlName("SE5") + " XE5 "
+		cQuery += " WHERE XE5.E5_FILIAL = '" + xFilial("SE5") + "'"
+		cQuery += " AND D_E_L_E_T_ <> '*' "
+		cQuery += " AND XE5.E5_PREFIXO = SE5.E5_PREFIXO "
+		cQuery += " AND XE5.E5_NUMERO  = SE5.E5_NUMERO "
+		cQuery += " AND XE5.E5_PARCELA = SE5.E5_PARCELA "
+		cQuery += " AND XE5.E5_TIPO    = SE5.E5_TIPO "
+		cQuery += " AND XE5.E5_CLIFOR  = SE5.E5_CLIFOR "
+		cQuery += " AND XE5.E5_LOJA    = SE5.E5_LOJA "
+		cQuery += " AND XE5.E5_SEQ     = SE5.E5_SEQ "
+		cQuery += " AND XE5.E5_TIPODOC = 'ES' " 
+		cQuery += " AND XE5.E5_RECPAG  = 'P' )"
+
+		cQuery += " ORDER BY " + cOrder
+	
+		cQuery := ChangeQuery(cQuery)
+
+		dbSelectArea("SE5")
+		aStruArq := SE5->(dbStruct())
+		dbCloseArea()
+
+		dbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery), 'NEWSE5', .T., .T.)
+	
+		For ni := 1 to Len(aStruArq)
+			If aStruArq[ni,2] != 'C'
+				TCSetField('NEWSE5', aStruArq[ni,1], aStruArq[ni,2],aStruArq[ni,3],aStruArq[ni,4])
+			Endif
+		Next
+	Else
+#ENDIF	
+		If ( ChkFile("SE5",.F.,"NEWSE5") )
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Cria IndRegua com filtragem do SE5                           ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			dbSelectArea("NEWSE5")
+			dbSetOrder(1)
+			cIndexSe5 := CriaTrab(nil,.f.)
+			cChaveSe5 := IndexKey()
+			IndRegua("NEWSE5",cIndexSe5,cChaveSe5,,fr750Chec5(),OemToAnsi("Selecionando Registros..."))  //
+			dbSelectArea("NEWSE5")
+			dbSeek( xFilial("SE5") )
+		EndIf
+#IFDEF TOP
+	Endif	
+#ENDIF
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Abre o SE5 com outro alias para ser filtrado porque a funcao³
+//³ TemBxCanc() utilizara o SE5 sem filtro.							 ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+While NEWSE5->(!Eof()) .and. !lEnd .and. NEWSE5->E5_FILIAL == xFilial("SE5")	
+	IncRegua()
+	
+	IF lEnd
+		@PROW()+1,001 PSAY OemToAnsi("CANCELADO PELO OPERADOR")  //
+		Exit
+	Endif
+
+	#IFNDEF TOP	
+		If !Fr750Skip2()
+			NEWSE5->(dbSkip())
+			Loop
+		EndIf	
+	#ELSE
+		If TcSrvType() != "AS/400"
+			If !Fr750Skip2()
+				NEWSE5->(dbSkip())
+				Loop
+			EndIf					
+		EndIf	
+	#ENDIF
+
+	If cPaisLoc	# "BRA"
+	   SA6->(DbSetOrder(1))
+	   SA6->(DbSeek(xFilial()+NEWSE5->E5_BANCO+NEWSE5->E5_AGENCIA+NEWSE5->E5_CONTA))
+	   nMoedaBco	:=	Max(SA6->A6_MOEDA,1)
+	Endif
+
+    If mv_par08 == 2
+      If nMoedaBco <> nMoeda
+         NEWSE5->(DbSkip())
+         Loop
+      EndIf
+    EndIf    
+
+	nValorSe5 := 0
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Verifica se Baixa gerou movimentacao Bancaria                    ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If MovBcoBx( NEWSE5->E5_MOTBX )
+		nValorSe5 := xMoeda(NEWSE5->E5_VALOR,nMoedaBco,nMoeda,NEWSE5->E5_DATA,nDecs+1,,If(cPaisLoc=="BRA",NEWSE5->E5_TXMOEDA,0))
+	Endif
+	
+	dDtPagto  := NEWSE5->E5_DATA
+		
+	#IFNDEF TOP
+		nDias     := dDataBase - dDtPagto
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Recebido a mais de 30 dias                                   ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+//		If nDias > 30
+		If nDias > ( dDataBase - MV_PAR11 )
+			NEWSE5->(dbSkip())
+			Loop
+		Endif
+	#ENDIF
+		
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³ Verifica se foi pago com atraso                              ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	dbSelectArea("SE1")
+	dbSetOrder(1)
+	dbSeek(xFilial()+NEWSE5->E5_PREFIXO+NEWSE5->E5_NUMERO+NEWSE5->E5_PARCELA+NEWSE5->E5_TIPO)
+	
+	If SE1->E1_EMISSAO > dDataBase .or. SE1->(Eof())
+		dbSelectArea("NEWSE5")
+		NEWSE5->( dbSkip() )
+		Loop
+	Endif
+
+	IF SE1->E1_MOEDA > 1
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Caso a Moeda seja > 1, converte o valor da movimenta‡„o pela ³
+		//³ cota‡„o da  moeda na Data de EmissÆo do T¡tulo, pois podem   ³
+		//³ ter sido efetuadas baixas informando taxa contratada.        ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		If cPaisLoc == "BRA"
+			// Para as movimentacoes que existem taxa contratada, converte pela taxa, senao
+			// encontra a taxa contratada atraves do E5_VLMOED2
+		   If NEWSE5->E5_TXMOEDA > 0 
+		   	nValorSE5:=Round(xMoeda(NEWSE5->E5_VALOR,1,nMoeda,NEWSE5->E5_DATA,nDecs+1,,NEWSE5->E5_TXMOEDA),2)
+		   Else
+		   	nValorSE5:=Round(xMoeda(NEWSE5->E5_VLMOED2,SE1->E1_MOEDA,1,SE1->E1_EMISSAO,3),2)
+		   Endif	
+		Else
+		   nValorSE5:=xMoeda(NEWSE5->E5_VLMOED2,nMoedaBco,nMoeda,SE1->E1_EMISSAO,nDecs+1)		
+		EndIf   
+	Endif
+	dbSelectArea("cNomeArq")
+//	dDtSeek := Iif(SE1->E1_VENCREA < dDatabase-30,dDatabase-31,SE1->E1_VENCREA)
+	dDtSeek := Iif(SE1->E1_VENCREA < dDatabase-(dDataBase-MV_PAR11),dDatabase-((dDataBase-MV_PAR11)+1),SE1->E1_VENCREA)
+	lAnterior := .f.
+
+//	If NEWSE5->E5_DTDISPO > (dDataBase-31).and. NEWSE5->E5_DTDISPO<=dDataBase.and.SE1->E1_VENCREA<=(dDataBase-31)
+	If NEWSE5->E5_DTDISPO > (dDataBase-((dDatabase-MV_PAR11)+1)).and. NEWSE5->E5_DTDISPO<=dDataBase.and.SE1->E1_VENCREA<=(dDataBase-((dDataBase-MV_PAR11)+1))
+		If dbSeek(DtoS(dDtSeek))
+			Reclock("cNomeArq")
+		Else
+			Reclock("cNomeArq",.T.)
+		Endif
+		lAnterior := .t.
+		cNomeArq ->D_DATA := (dDtSeek)
+		If NEWSE5->E5_TIPODOC $ "VLüBAüV2üRA" .and. MovBcoBx(NEWSE5->E5_MOTBX)
+			cNomeArq -> VALOR_D += nValorSe5
+		Elseif NEWSE5->E5_TIPODOC $ "DCüD2" .and. MovBcoBx(NEWSE5->E5_MOTBX) 
+			cNomeArq -> DESCO_B += nValorSe5
+		Elseif NEWSE5->E5_TIPODOC $ "JRüJ2üMTüM2üCMüC2üTL" .and. MovBcoBx(NEWSE5->E5_MOTBX)
+			cNomeArq -> ACRES_B += nValorSe5
+		Endif
+	Endif
+
+	If SE1->E1_VENCREA <= dDataBase
+		If dbSeek(DtoS(dDtSeek))
+			Reclock("cNomeArq")
+		Else
+			Reclock("cNomeArq",.T.)
+		Endif
+		cNomeArq ->D_DATA := (dDtSeek)
+		If SE1->E1_VENCREA >= dDtPagto    // Sem Atraso
+			If NEWSE5->E5_TIPODOC $ "VLüBAüV2üRA"
+				cNomeArq -> VALOR_C += nValorSe5
+			Elseif NEWSE5->E5_TIPODOC $ "DCüD2"
+				cNomeArq -> DESCO_A += nValorSe5
+			Elseif NEWSE5->E5_TIPODOC $ "JRüJ2üMTüM2üCMüC2üTL"
+				cNomeArq -> ACRES_A += nValorSe5
+			Endif
+		Else                 // com atraso
+			If !lAnterior
+				If dbSeek(DtoS(dDtSeek))
+					Reclock("cNomeArq")
+				Else
+					Reclock("cNomeArq",.T.)
+				Endif
+				cNomeArq ->D_DATA := (dDtSeek)
+				If NEWSE5->E5_TIPODOC $ "VLüBAüV2üRA"
+					cNomeArq -> VALOR_D += nValorSe5
+				Elseif NEWSE5->E5_TIPODOC $ "DCüD2"
+					cNomeArq -> DESCO_B += nValorSe5
+				Elseif NEWSE5->E5_TIPODOC $ "JRüJ2üMTüM2üCMüC2üTL"
+					cNomeArq -> ACRES_B += nValorSe5
+				Endif
+			Endif
+		Endif
+	Endif
+	
+	If NEWSE5->E5_TIPODOC $ "VL/BA/V2/RA" .and. NEWSE5->E5_DTDISPO > (dDatabase-((dDataBase-MV_PAR11)+1)) .and. ;  //NEWSE5->E5_DTDISPO > (dDatabase-31)  //(receitas do dia)
+		MovBcoBx(NEWSE5->E5_MOTBX)
+		If dbSeek(DtoS(NEWSE5->E5_DTDISPO))
+			Reclock("cNomeArq")
+		Else
+			Reclock("cNomeArq",.T.)
+		End
+		If SE1->E1_VENCREA > NEWSE5->E5_DTDISPO .AND. SE1->E1_VENCREA > dDataBase
+			nValAdto += xMoeda(NEWSE5->E5_VALOR,nMoedaBco,nMoeda,NEWSE5->E5_DATA,nDecs+1,,If(cPaisLoc=="BRA",NEWSE5->E5_TXMOEDA,0))
+		End
+		cNomeArq ->D_DATA    := NEWSE5->E5_DTDISPO
+//		cNomeArq -> PGTDI_H += xMoeda(NEWSE5->E5_VALOR,nMoedaBco,nMoeda,NEWSE5->E5_DATA,nDecs+1,,If(cPaisLoc=="BRA",NEWSE5->E5_TXMOEDA,0))
+	End
+	
+
+	MsUnlock()
+	If NEWSE5->E5_TIPODOC $ "VL/BA/V2/RA" .and. NEWSE5->E5_DTDIGIT > dDatabase-((dDataBase-MV_PAR11)+1) //dDatabase-31    //(baixados no dia)
+		If dbSeek(DtoS(NEWSE5->E5_DTDIGIT))
+			Reclock("cNomeArq")
+		Else
+			Reclock("cNomeArq",.T.)
+		End
+		cNomeArq ->D_DATA    := NEWSE5->E5_DTDIGIT
+//		cNomeArq -> BAIXADIA+= Iif(MovBcoBx(NEWSE5->E5_MOTBX),xMoeda(NEWSE5->E5_VALOR,nMoedaBco,nMoeda,NEWSE5->E5_DATA,nDecs+1,,If(cPaisLoc=="BRA",NEWSE5->E5_TXMOEDA,0)),0)
+//		cNomeArq -> NOCREDIT+= Iif(MovBcoBx(NEWSE5->E5_MOTBX),0,xMoeda(NEWSE5->E5_VALOR,nMoedaBco,nMoeda,NEWSE5->E5_DATA,nDecs+1,,If(cPaisLoc=="BRA",NEWSE5->E5_TXMOEDA,0)))
+	End
+	MsUnlock()
+
+	dbSelectArea("NEWSE5")
+	dbSkip()
+Enddo
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Grava Movimenta‡„o zerada se data nao houver registro        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("cNomeArq")
+
+//For i:=0 TO 30
+For i:=0 TO (dDataBase-MV_PAR11)
+	If ! (dbSeek(DtoS(dDataBase - i)))
+		Reclock("cNomeArq", .T. )
+		cNomeArq->D_DATA := dDataBase - i
+		MsUnlock()
+	End
+Next i
+
+dbGoTop()
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Executa a impressao do relatorio                             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+While !Eof()
+	
+	if D_DATA > dDataBase .OR. D_DATA > MV_PAR12
+	   dbSkip()
+	   Loop
+	endif
+	
+	If li > 58
+		cabec(titulo,cabec1,cabec2,nomeprog,tamanho,GetMv("MV_COMP"))
+	Endif
+	
+	If lFirst
+		@li, 00 PSAY OemToAnsi("ANTERIOR A ") + DtoC(D_DATA)  //
+		If cPaisLoc == "BRA"
+		   @li, 67 PSAY cNomeArq->DESCO_B  Picture "@E 9999,999.99" //TM(cNomeArq->DESCO_B,12)
+		   @li, 79 PSAY cNomeArq->ACRES_B  Picture "@E 9999,999.99" //TM(cNomeArq->ACRES_B,12)
+		Else
+		   @li, 67 PSAY cNomeArq->DESCO_B  Picture PesqPict("SE5","E5_VALOR",11,nMoeda) 
+		   @li, 79 PSAY cNomeArq->ACRES_B  Picture PesqPict("SE5","E5_VALOR",11,nMoeda) 
+		EndIf		   
+		@li, 94 PSAY cNomeArq->VALOR_D  Picture TM(cNomeArq->VALOR_D,13,nDecs)
+		@li,136 PSAY cNomeArq->VALOR_G  Picture TM(cNomeArq->VALOR_G,13,nDecs)
+		li++
+		@ li,0 Say Replicate("-",220)
+		li++
+		lFirst := .f.
+		dbSkip()
+		LOOP
+	End
+	
+	@li, 00 PSAY D_DATA
+	@li, 11 PSAY VALOR_B   Picture TM(cNomeArq->VALOR_B,13,nDecs) // VL. TITULOS
+	@li, 25 PSAY DESCO_A   Picture TM(cNomeArq->DESCO_A,12,nDecs) // DESC.S/ATRASO
+	If cPaisLoc == "BRA"                                                                                                                    
+	   @li, 38 PSAY ACRES_A   Picture "@E 9999,999.99"  //TM(cNomeArq->ACRES_A,11) // ACRESC. S/ ATRASO	
+	Else   
+	   @li, 38 PSAY ACRES_A   Picture PesqPict("SE5","E5_VALOR",11,nMoeda) //TM(cNomeArq->ACRES_A,11) // ACRESC. S/ ATRASO
+	EndIf   
+	@li, 52 PSAY VALOR_C   Picture TM(cNomeArq->VALOR_C,14,nDecs) //TOT. REC. S/ ATRASO
+	If cPaisLoc == "BRA"                                                                                                                    	
+	   @li, 67 PSAY DESCO_B   Picture  "@E 9999,999.99"  //TM(cNomeArq->DESCO_B,11) //DESC. C/ ATRASO
+	   @li, 79 PSAY ACRES_B   Picture  "@E 9999,999.99"  //TM(cNomeArq->ACRES_B,11) // ACRESC. C/ ATRASO
+	Else
+	   @li, 67 PSAY DESCO_B   Picture PesqPict("SE5","E5_VALOR",11,nMoeda) //TM(cNomeArq->DESCO_B,11) //DESC. C/ ATRASO
+	   @li, 79 PSAY ACRES_B   Picture PesqPict("SE5","E5_VALOR",11,nMoeda) //TM(cNomeArq->ACRES_B,11) // ACRESC. C/ ATRASO
+	EndIf   
+	@li, 93 PSAY VALOR_D   Picture TM(cNomeArq->VALOR_D,14,nDecs) // TOT.REC C/ ATRASO
+	nValorE := VALOR_B - (VALOR_C-ACRES_A+DESCO_A)
+	@li,110 PSAY nValorE   Picture TM(nValorE,14,nDecs) //VALOR N.PAGO NO DIA DO VCTO
+	nTValorE += nValorE
+	@li,125 PSAY (1-(nValorE/VALOR_B))*100   Picture tm((1-(nValorE/VALOR_B))*100,8,nDecs)
+//	@li,135 PSAY VALOR_G   Picture tm(cNomeArq->VALOR_G,14,nDecs)  //SALDO PENDENTE
+    nSaldo := VALOR_B-VALOR_C-VALOR_D
+	@li,135 PSAY nSaldo Picture tm(cNomeArq->VALOR_G,14,nDecs)  //SALDO PENDENTE	
+//	@li,151 PSAY (1-(VALOR_G/VALOR_B))*100   Picture TM((1-(cNomeArq->VALOR_G/cNomeArq->VALOR_B))*100,7,nDecs)
+	@li,151 PSAY (1-(nSaldo/VALOR_B))*100   Picture TM((1-(nSaldo/cNomeArq->VALOR_B))*100,7,nDecs)	
+//	@li,159 PSAY (PGTDI_H)    Picture TM(cNomeArq->PGTDI_H,14,nDecs)  //VL.CRED. NO DIA
+//	@li,174 PSAY (BAIXADIA)   Picture TM(cNomeArq->BAIXADIA,14,nDecs) //VL.BAIX.NO DIA
+//	@li,190 PSAY (NOCREDIT)   Picture TM(cNomeArq->NOCREDIT,14,nDecs) //VL.BAIX. SEM CREDITO
+	nTotValB+=VALOR_B
+	nTotValG+=nSaldo
+	nTotDescoA+=DESCO_A
+	nTotAcresA+=ACRES_A
+	nTotValorC+=VALOR_C
+	nTotDescoB+=DESCO_B
+	nTotAcresB+=ACRES_B
+	nTotValorD+=VALOR_D
+//	nTotPgtdi_h+=PGTDI_H
+//	nTotBaixa+=BAIXADIA
+//	nTotNoCred+=NOCREDIT
+	li++
+	dbSkip()
+End
+
+If li != 80
+	li+=2
+	@li,011 PSAY nTotValB              Picture TM(nTotValB,13,nDecs)
+	@li,025 PSAY nTotDescoA            Picture TM(nTotDescoA,12,nDecs)            
+	If cPaisLoc == "BRA"
+	   @li,038 PSAY nTotAcresA         Picture "@E 9999,999.99" //TM(nTotAcresA,11)	
+	Else   	   
+	   @li,038 PSAY nTotAcresA         Picture PesqPict("SE5","E5_VALOR",11,nMoeda)
+	EndIf   
+	@li,052 PSAY nTotValorC            Picture TM(nTotValorC,14,nDecs)
+	If cPaisLoc == "BRA"
+	   @li,067 PSAY nTotDescoB         Picture "@E 9999,999.99" //TM(nTotDescoB,11)
+	   @li,079 PSAY nTotAcresB         Picture "@E 9999,999.99" //TM(nTotDescoB,11)
+	Else	
+	   @li,067 PSAY nTotDescoB         Picture PesqPict("SE5","E5_VALOR",11,nMoeda) //TM(nTotDescoB,11)
+	   @li,079 PSAY nTotAcresB         Picture PesqPict("SE5","E5_VALOR",11,nMoeda) //TM(nTotAcresB,11)
+	EndIf  
+	@li,093 PSAY nTotValorD            Picture TM(nTotValorD,14,nDecs)
+	@li,110 PSAY nTValorE              Picture TM(nTValorE,14,nDecs)
+	@li,125 PSAY (1-(nTValorE/nTotValB)) * 100 Picture TM((1-(nTValorE/nTotValB)) * 100,8,nDecs)
+	@li,135 PSAY nTotValG              Picture TM(nTotValG,14,nDecs)
+	@li,151 PSAY (1-(nTotValG/nTotValB))*100 Picture TM((1-(nTotValG/nTotValB))*100,7,nDecs)
+//	@li,159 PSAY nTotPgtdi_H           Picture TM(nTotPgtdi_H,14,nDecs)
+//	@li,174 PSAY nTotBaixa             Picture TM(nTotBaixa,14,nDecs)
+//	@li,190 PSAY nTotNoCred            Picture TM(nTotNoCred,14,nDecs)
+//	@li,205 PSAY nValAdto              Picture TM(nValAdto,14,nDecs)
+	roda(cbcont,cbtxt,tamanho)
+End
+dbSelectArea("SE1")
+#IFNDEF TOP
+	dbClearFil()
+	RetIndex("SE1")
+	Ferase(cIndexSe1+OrdBagExt())
+#ENDIF	
+
+If Select("NEWSE5") != 0
+	dbSelectArea("NEWSE5")
+	dbCloseArea()
+	#IFNDEF TOP
+		Ferase(cIndexSe5+OrdBagExt())
+	#ENDIF
+EndIf
+
+If Select("cNomeArq") != 0
+	dbSelectArea("cNomeArq")
+	dbCloseArea()
+	Ferase(cNomeArq+GetDBExtension())         // Elimina arquivos de Trabalho
+	#IFNDEF TOP
+		Ferase(cNomeArq+OrdBagExt())    // Elimina arquivos de Trabalho
+	#ENDIF
+EndIf
+
+Set Device To Screen
+
+#IFDEF TOP
+   if TcSrvType() != "AS/400"
+		dbSelectArea("SE1")
+		dbCloseArea()
+		ChKFile("SE1")
+   	dbSelectArea("SE1")
+		dbSetOrder(1)
+		ChKFile("SE5")
+   	dbSelectArea("SE5")
+		dbSetOrder(1)
+	else
+#ENDIF
+		dbSelectArea("SE1")
+		dbClearFil()
+		dbSetOrder(1)
+		dbSelectArea("SE5")
+		dbClearFil()
+		dbSetOrder(1)
+#IFDEF TOP
+	Endif
+#ENDIF	
+
+If aReturn[5] = 1
+	Set Printer To
+	dbCommitAll()
+	Ourspool(wnrel)
+End
+MS_FLUSH()
+
+/*/
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡„o    ³fr750Chec1³ Autor ³ Wagner Xavier         ³ Data ³ 09/05/96 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡„o ³Efetua sele‡„o dos T¡tulos.                                 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³FinR750                                                     ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function fr750Chec1()
+Local cString
+cString := 'E1_NATUREZ >= "'+mv_par03+'" .and. E1_NATUREZ <= "'+mv_par04+'" .And. '
+cString := 'E1_FILORIG >= "'+mv_par09+'" .and. E1_FILORIG <= "'+mv_par10+'" .And. '
+cString += 'E1_PREFIXO >= "'+mv_par01+'" .and. E1_PREFIXO <= "'+mv_par02+'"'
+Return cString
+
+/*/
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡„o    ³fr750Chec5³ Autor ³ Wagner Xavier         ³ Data ³ 09/05/96 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡„o ³Efetua sele‡„o das Baixas.                                  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso      ³FinR750                                                     ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function fr750Chec5()
+Local cString
+Local cTipodoc := "VLüBAüV2üDCüJRüD2üJ2üMTüM2üCMüC2üTLüRA"
+cString := 'E5_TIPODOC$"'+cTipodoc+'" .And. '
+cString += 'E5_NATUREZ >= "'+mv_par03+'" .and. E5_NATUREZ <= "'+mv_par04+'" .And. '
+cString += 'E5_PREFIXO >= "'+mv_par01+'" .and. E5_PREFIXO <= "'+mv_par02+'" .And. '
+cString += 'E5_FILORIG >= "'+mv_par09+'" .and. E5_PREFIXO <= "'+mv_par10+'" .And. '
+cString += 'E5_RECPAG = "R" .And. '
+cString += 'dtos(E5_DTDISPO) >= "'+dtos(dDataBase-33)+'"'      //reten‡„o
+Return cString
+
+
+Static Function InSide(cTp)
+IF mv_par05 != 1
+	Return .t.
+Else
+	Return (cTp$cTipos)
+Endif
+
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡„o	 ³Fr750Skip ³ Autor ³ Pilar S. Albaladejo	  ³ Data ³ 13.10.99 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡„o ³Pula registros de acordo com as condicoes (AS 400/CDX/ADS)  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso		 ³ FINR750.PRX																  ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function Fr750Skip()
+
+Local lRet := .T.
+
+IF E1_TIPO $ MVPROVIS+"/"+MVRECANT+"/"+MV_CRNEG+"/"+MVABATIM
+	lRet := .F.
+ElseIf ! Inside(SE1->E1_TIPO)
+	lRet := .F.
+ElseIf SE1->E1_EMISSAO > dDataBase .or. SE1->E1_VENCREA > dDataBase
+	lRet := .F.
+Endif
+
+Return lRet
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Fun‡„o	 ³Fr750Skip2³ Autor ³ Pilar S. Albaladejo	  ³ Data ³ 13.10.99 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡„o ³Pula registros de acordo com as condicoes (AS 400/CDX/ADS)  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³ Uso		 ³ FINR750.PRX																  ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function Fr750Skip2()
+
+Local lRet := .T.
+
+IF NEWSE5->E5_TIPO $ MVPROVIS+"/"+MV_CRNEG
+	lRet := .F.
+ElseIf !Inside(NEWSE5->E5_TIPO)
+	lRet := .F.
+ElseIf TemBxCanc(NEWSE5->E5_PREFIXO+NEWSE5->E5_NUMERO+NEWSE5->E5_PARCELA+NEWSE5->E5_TIPO+NEWSE5->E5_CLIFOR+NEWSE5->E5_LOJA+NEWSE5->E5_SEQ) .OR.;
+	NEWSE5->E5_SITUACA =="C"
+	lRet := .F.
+EndIf
+
+Return lRet

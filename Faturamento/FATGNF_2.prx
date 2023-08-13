@@ -1,0 +1,139 @@
+#Include "RwMake.ch"
+#INCLUDE "TOPCONN.CH"
+#include "font.ch"
+#include "colors.ch"
+
+*************
+
+User Function FATGNF_2
+
+*************
+/*
+SetPrvt( "oDLG1,oBRW1," )
+SetPrvt( "aESTRUT,oFONT1," )
+
+Validperg()
+If ! Pergunte( "FATRNF", .T. )
+   Return NIL
+EndIf
+*/
+
+cPerg := "FATRNF"
+Pergunte(cPerg, .T.)
+
+aESTRUT   := { { "A1_NREDUZ",  "C", 020, 0 }, ;  // Campos do arquivo do MSSELECT dos produtos
+               { "A1_TEL",     "C", 020, 0 }, ;
+               { "A1_MUN",     "C", 025, 0 }, ;
+               { "F2_DOC",     "C", 015, 0 }, ;
+               { "F2_EMISSAO", "D", 012, 0 }, ;
+               { "A4_NREDUZ",  "C", 020, 0 }, ;
+               { "A1_CONTATO", "C", 020, 0 }, ;
+               { "ZZ_PRZENT",  "N", 003, 0 }}
+
+cARQTMP := CriaTrab( aESTRUT, .T. )
+DbUseArea( .T.,, cARQTMP, "SZZZ", .F., .F. )
+Index On A1_NREDUZ + A1_TEL + A1_MUN To &cARQTMP //Chutei
+
+DEFINE FONT oFont4 NAME "Courier New" SIZE 0, 15 BOLD
+DEFINE FONT oFont1 NAME "Arial"       SIZE 0, 13 BOLD
+DEFINE FONT oFont2 NAME "Courier New" SIZE 0, 14 BOLD
+DEFINE FONT oFont3 NAME "Arial"       SIZE 0, 13 BOLD UNDERLINE
+
+CriaGrid()
+
+SZZZ->( DbCloseArea() )
+
+Return NIL
+
+
+
+***************
+
+Static Function LeBase()
+
+***************
+
+cQuery := "select   distinct SA1.A1_NREDUZ, SA1.A1_TEL, SA1.A1_MUN, "
+cQuery += "SF2.F2_DOC, SF2.F2_EMISSAO, SA4.A4_NREDUZ, SA1.A1_CONTATO, SZZ.ZZ_PRZENT "
+cQuery += "from "+ RetSqlName("SA1") + " SA1, " + RetSqlName("SF2") +" SF2, " + RetSqlName("SA4") + " SA4, " + RetSqlName("SZZ") + " SZZ "
+*cQuery += "where SF2.F2_CLIENTE = SA1.A1_COD and SF2.F2_EMISSAO >= '20060626' and SF2.F2_EMISSAO <= '20060628' "
+cQuery += "where SF2.F2_CLIENTE = SA1.A1_COD and SF2.F2_EMISSAO >= '" + Dtos(mv_par01) + "' and SF2.F2_EMISSAO <= '" + Dtos(mv_par02) + "' "
+cQuery += "and SF2.F2_TRANSP = SA4.A4_COD and SF2.F2_TRANSP = SZZ.ZZ_TRANSP "
+cQuery += "and SA1.A1_MUN = substring(SZZ.ZZ_DESC, 1, len(SA1.A1_MUN))"
+cQuery += "and SA1.D_E_L_E_T_ = ' ' and SF2.D_E_L_E_T_ = ' '  and SA4.D_E_L_E_T_  = ' ' "
+cQuery += "and SA1.A1_FILIAL  = ' ' and SF2.F2_FILIAL  = '01' and SA4.A4_FILIAL = ' ' "
+cQuery += "order by SF2.F2_EMISSAO, SF2.F2_DOC, SA1.A1_NREDUZ"
+cQuery := ChangeQuery( cQuery )
+TCQUERY cQuery NEW ALIAS "SFFA"
+TCSetField( 'SFFA', "F2_EMISSAO", "D")
+
+SZZZ->( __DbZap() )
+SFFA->( DbGotop() )
+
+Do While ! SFFA->( Eof() )
+
+  SZZZ->( DbAppend() )
+
+  SZZZ->A1_NREDUZ  := SFFA->A1_NREDUZ
+  SZZZ->A1_TEL     := SFFA->A1_TEL
+  SZZZ->A1_MUN     := SFFA->A1_MUN
+  SZZZ->F2_DOC     := SFFA->F2_DOC
+  SZZZ->F2_EMISSAO := SFFA->F2_EMISSAO
+  SZZZ->A4_NREDUZ  := SFFA->A4_NREDUZ
+  SZZZ->A1_CONTATO := SFFA->A1_CONTATO
+  SZZZ->ZZ_PRZENT  := SFFA->ZZ_PRZENT
+
+  SFFA->( DBSkip() )
+
+EndDo
+
+SFFA->( DBCloseArea() ) //    SFFA->( DbAppend() ) lembrar de usar
+Return NIL
+
+
+***************
+
+Static Function CriaGrid()
+
+***************
+/*
+DEFINE FONT oFont4 NAME "Courier New" SIZE 0, 20 BOLD
+DEFINE FONT oFont1 NAME "Arial"       SIZE 0, 13 BOLD
+DEFINE FONT oFont2 NAME "Courier New" SIZE 0, 14 BOLD
+DEFINE FONT oFont3 NAME "Arial"       SIZE 0, 13 BOLD UNDERLINE
+*/
+
+LeBase()
+
+@ 000,000 TO 312,795 Dialog oDLG2 Title "Planilha Pos-Vendas -> Dia: " + Dtoc( date() )
+oBRW1 := MsSelect():New(   "SZZZ",,, ;
+                        {{ "A1_NREDUZ"  ,,  OemToAnsi( "Nome") }, ;
+                         { "A1_TEL"     ,,  OemToAnsi( "Telefone") }, ;
+                         { "A1_MUN"     ,,  OemToAnsi( "Municipio") }, ;
+                         { "F2_DOC"     ,,  OemToAnsi( "Nota Fiscal") }, ;
+                         { "F2_EMISSAO" ,,  OemToAnsi( "Emissao") }, ;
+                         { "A4_NREDUZ"  ,,  OemToAnsi( "Transportadora      ") }, ;
+                         { "A1_CONTATO" ,,  OemToAnsi( "Responsavel   ") }, ;
+                         { "ZZ_PRZENT"  ,,  OemToAnsi( "Prazo de Entrega") }},;
+                           .F.,, { 013, 000, 155, 397 } )  //posicionamento vertical, posicionamento horizontal, largura vetical-285, largura horizontal
+oBRW1:oBROWSE:SetFont( oFont4 )
+oBRW1:oBROWSE:nCLRFOREFOCUS := CLR_WHITE
+//Activate Dialog oDLG Centered On Init EnchoiceBar( oDlg, { || If( oBRW1:TudoOk(), oDlg:End(), NIL ), .F. }, { || oDlg:End() },, /*aBOTOES*/ )
+Activate Dialog oDLG2 Centered On Init EnchoiceBar( oDlg2, { || If( oBRW1:TudoOk(), oDlg2:End(), NIL ), .F. }, { || oDlg2:End() },, /*aBOTOES*/ )
+
+Return NIL
+
+
+/*
+***************
+
+Static Function ValidPerg()
+
+***************
+
+PutSx1( "FATRNF", '01', 'Data inicial: ', 'Data inicial: ', 'Data inicial: ', 'mv_ch1', 'D', 01, 0, 0, 'G', '', ''   , '', '', 'mv_par01', ''               , '', '', '' ,''               , '', '', ''               , '', '', ''               , '', '', '', '', '', {}, {}, {} )
+PutSx1( "FATRNF", '02', 'Data final:   ', 'Data final:   ', 'Data final:   ', 'mv_ch2', 'D', 06, 0, 0, 'G', '', '', '', '', 'mv_par02', ''               , '', '', '' ,''               , '', '', ''               , '', '', ''               , '', '', '', '', '', {}, {}, {} )
+Return NIL
+
+ */
+

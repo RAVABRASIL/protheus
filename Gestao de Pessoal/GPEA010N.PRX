@@ -1,0 +1,2821 @@
+#INCLUDE "PROTHEUS.CH"
+#INCLUDE "GPEA010.CH"
+
+/*/
+эээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠иммммммммммяммммммммммммкмммммммямммммммммммммммммммммммкммммммямммммммммммм╩╠╠
+╠╠╨Fun┤┘o    Ё GPEA010    ЁAutor  ЁJ. Ricardo         v.I Ё Data Ё 13/10/1992 ╨╠╠
+╠╠╨          Ё            ЁAutor  ЁMarinaldo de Jesus v.IIЁ Data Ё 04/02/2004 ╨╠╠
+╠╠лддддддддддеддддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддддд╧╠╠
+╠╠╨Descri┤┘o Ё Cadastramento de Funcionarios                                  ╨╠╠
+╠╠лддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╧╠╠
+╠╠╨Sintaxe   Ё GPEA010()                                                      ╨╠╠
+╠╠лддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╧╠╠
+╠╠╨Uso       Ё Generico                                                       ╨╠╠
+╠╠лддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╧╠╠
+╠╠╨         ATUALIZACOES SOFRIDAS DESDE A CONSTRU─AO INICIAL.                 ╨╠╠
+╠╠лддддддддддддбддддддддддбддддддбдддддддддддддддддддддддддддддддддддддддддддд╧╠╠
+╠╠╨Programador Ё Data     Ё BOPS Ё  Motivo da Alteracao                       ╨╠╠
+╠╠лддддддддддддеддддддддддеддддддедддддддддддддддддддддддддддддддддддддддддддд╧╠╠
+╠╠╨Marinaldo   Ё 04/02/04 ЁMelhorЁReescrita do Codigo e Integracao com o RDZ  ╨╠╠
+╠╠╨            Ё          Ё      Ёe RD0                                       ╨╠╠
+╠╠╨Emerson     Ё 18/03/05 Ё080065ЁSomente enviar e-mail para admitidos.       ╨╠╠
+╠╠╨ Andreia    Ё 14/01/05 Ё073985Ё Gravar no historico de salarios os campos  ╨╠╠
+╠╠╨            Ё          Ё      Ё "R7_CARGO" e "R7_DESCCAR".	 	 	      ╨╠╠
+╠╠╨Ricardo D.  Ё 20/04/05 Ё080121ЁCriado o ponto de entrada Gp010ValPE para   ╨╠╠
+╠╠╨            Ё          Ё      Ёvalidar inclusao/alteracao de funcionarios  ╨╠╠
+╠╠╨Natie       Ё 30/05/05 Ё082474ЁQdo efetuava pesquisa no browse por cod.da  ╨╠╠
+╠╠╨            Ё          Ё      Ёfuncao e selecionava um funcionario, ao es  ╨╠╠
+╠╠╨            Ё          Ё      Ёcolher a opcao Alteracao, mostrava outro    ╨╠╠
+╠╠╨            Ё          Ё      Ёfuncionario na enchoice                     ╨╠╠
+╠╠╨Ricardo D.  Ё 03/06/05 Ё082735ЁIncluido alias SRC p/ser testado durante a  ╨╠╠
+╠╠╨            Ё          Ё      Ёexclusao. Este alias nao deve ser incluido  ╨╠╠
+╠╠╨            Ё          Ё      Ёno SX9 p/nao afetar o fechameento mensal.   ╨╠╠
+╠╠Ё Andreia    Ё 07/07/05 Ё082899Ё Criada validacao no campo RA_CATFUNC para  Ё╠╠
+╠╠Ё            Ё          Ё      Ёnao permitir que a categoria seja alterada  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёpara "A"(autonomo) quando o funcionario ja  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёestiver cadastrado.                         Ё╠╠ 
+╠╠ЁEmerson G.R.Ё 05/08/05 Ё085027ЁValidacao no campo RA_DATAALT para nao      Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёpermitir data menor que a data de admissao  Ё╠╠ 
+╠╠Ё Andreia    Ё 23/08/05 Ё085118ЁTratamento do campo R3_ANTEAUM, para arma-  Ё╠╠
+╠╠Ё            Ё          Ё      Ёzenar no historico salarial o valor base    Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёpara dissidio.( Funcao fGravaSr3)           Ё╠╠ 
+╠╠Ё Ricardo D. Ё 25/08/05 ЁFN2734ЁTratamento da consulta padrao do SRJ pois   Ё╠╠
+╠╠Ё            Ё          Ё/2005 Ёestavam invertidas as funcoes de inclusao   Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёe visualizacao.                             Ё╠╠ 
+╠╠ЁPedro Eloy  Ё 26/08/05 Ё085874ЁTratamento do gatilho do campo RA_CODFUNC   Ё╠╠
+╠╠Ё            Ё          Ё      Ёordem 6 buscar o campo RJ_CODCOB            Ё╠╠ 
+╠╠Ё Andreia    Ё 31/08/05 ЁFC QNCЁNao permitir que o salario de dissidio se-  Ё╠╠
+╠╠Ё            Ё          Ё2922  Ёja alterado sem informar o motivo de alte-  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёracao e a data de alteracao salarial.       Ё╠╠ 
+╠╠ЁEduardo Ju  Ё 23/09/05 Ё082978ЁCriacao do parametro MV_FUNCARG permitindo  Ё╠╠
+╠╠Ё            Ё          Ё      Ёatualizar o salario do funcionario c/ base  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёna Funcao ou Cargo.                         Ё╠╠ 
+╠╠Ё Andreia    Ё 27/10/05 Ё087448ЁFeito tratamento para somente gravar histo  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёrico salarial por motivo de alteraГЦo de    Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёcargo ou alteraГЦo de salario base de dis-  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёsidio, quando existirem os campos R7_CARGO  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ё e R3_ANTEAUM, respectivamente.             Ё╠╠ 
+╠╠Ё Eduardo    Ё 11/11/05 Ё------ЁInclusao de botao p/selecao de segmentos    Ё╠╠ 
+╠╠Ё Souza - GE Ё          Ё      Ёquando o modulo Academico estiver ativo.    Ё╠╠ 
+╠╠Ё Ricardo D. Ё 16/11/05 Ё088765ЁAjuste da gravacao da tabela SR7 p/ajustar  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёa utilizacao de integridade referencial.    Ё╠╠ 
+╠╠Ё Ricardo D. Ё 22/11/05 Ё088765ЁNovo ajuste da gravacao da tabela SR7 para  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёa utilizacao de integridade referencial.    Ё╠╠ 
+╠╠Ё Parceiros  Ё 01/02/06 Ё092511ЁAjuste na MdtAltFicha-passar xfilial()      Ё╠╠ 
+╠╠Ё Marcos AlveЁ 03/02/06 Ё92704 ЁPonto de entrada (GPE10BTN) para inclusЦo   Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёde botao                                    Ё╠╠ 
+╠╠Ё Silvia     Ё 07/02/06 Ё090746ЁAcerto na validacao do campo RA_CIC-Chile   Ё╠╠ 
+╠╠Ё Pedro Eloy Ё 10/02/06 Ё      ЁAjuste na sequencia na gravacao alt.salarialЁ╠╠ 
+╠╠Ё Pedro Eloy Ё 01/03/06 Ё      ЁAjuste no gatilho da descr.da funcao do CBO Ё╠╠ 
+╠╠Ё Eduardo Ju Ё 05/05/06 Ё094214Ё<Melhoria> Tratamento do MV_FUNCARG.        Ё╠╠ 
+╠╠ЁTania       Ё22/05/2006Ё097551ЁCriacao da Cons.Padrao Q3S para filtrar os  Ё╠╠
+╠╠Ё            Ё          Ё      Ёcargos pelo C.Custo do Funcionario. Cria-   Ё╠╠      
+╠╠Ё            Ё          Ё      Ёcao do Valid do RA_CARGO.                   Ё╠╠      
+╠╠ЁPedro Eloy  Ё02/06/2006Ё095839Ёtratamento ao confirmar do campo matricula  Ё╠╠
+╠╠ЁEmerson G.R.Ё14/06/2006Ё101290ЁAlteracao no AcertSX3, X3_F3 do RA_TABELA.  Ё╠╠
+╠╠ЁAndreia     Ё06/06/06  Ё100330ЁIncluir a funcao FHIST() na validacao dos   Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёcampos RA_NASC e RA_CBO.                    Ё╠╠ 
+╠╠Ё Natie      Ё05/07/06  Ё102002ЁTroca picture RA_TELEFON                    Ё╠╠ 
+╠╠Ё Ricardo D. Ё13/07/06  Ё103287ЁAjuste em GPEA010RUNVALID() p/posicionar no Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёcampo RA_MAT antes de executar a validacao. Ё╠╠ 
+╠╠Ё Ricardo D. Ё14/07/06  Ё103287ЁAjuste na validacao do campo RA_MAT p/passarЁ╠╠ 
+╠╠Ё            Ё          Ё      Ёa variavel M->RA_MAT na chamada da funcao   Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёexistchav().                                Ё╠╠ 
+╠╠Ё Natie      Ё03/08/06  Ё101002ЁPonto de entrada para validar exclusao      Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёde funcionarios- Gp010Excl                  Ё╠╠ 
+╠╠Ё Ricardo D. Ё25/08/06  Ё105574ЁAjuste na condicao das consultas padroes Q3SЁ╠╠ 
+╠╠Ё            Ё          Ё      Ёe RB601 de forma a nao gerar error.log duranЁ╠╠ 
+╠╠Ё            Ё          Ё      Ёte a consulta ao cadastro no rh-online.     Ё╠╠ 
+╠╠ЁAndreia     Ё06/09/06  Ё105654ЁAjuste em GPEA010RUNVALID() para focar o camЁ╠╠ 
+╠╠Ё            Ё          Ё      Ёpo RA_MAT antes de gravar, na Inclusao.     Ё╠╠ 
+╠╠ЁMarcos AlvesЁ29/09/06  Ё105654ЁAlterddo parametro 9 da funcao EntUpdateRd0 Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёpara nao atualizar os dado nas tabelas rela Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёcionadas com RD0                            Ё╠╠ 
+╠╠ЁSilvia      Ё08/11/06  Ё107448ЁModif.de validacao de campo - Argentina     Ё╠╠ 
+╠╠ЁAndreia     Ё05/01/07  Ё109585ЁAjuste em GP010F3RB6() para tratar tambem   Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёa chamada da funcao GPEA011(Gestao de fun-  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёcionarios).                                 Ё╠╠ 
+╠╠ЁMarcos AlvesЁ13/02/07  Ё116718ЁTratamento do campo RA_ANTEAUM, para modulosЁ╠╠ 
+╠╠Ё            Ё          Ё      Ёnao configurado                             Ё╠╠    
+╠╠ЁEduardo Ju  Ё14/02/07  Ё116988ЁImplementacao do Banco de Conhecimento.     Ё╠╠ 
+╠╠ЁRicardo D.  Ё26/02/07  Ё119536ЁAjuste na validacao do campo RA_MAT p/permi-Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёtir que seja excluido o texto Val(M->RA_MAT)Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёpois desta forma sera permitida a inclusao  Ё╠╠ 
+╠╠Ё            Ё          Ё      Ёde matriculas em caracter.                  Ё╠╠ 
+╠╠ЁNatie       Ё09/03/07  Ё114376ЁAjuste na Gpea010FunVld do tratamento do pa-Ё╠╠ 
+╠╠ЁNatie   e   Ё          Ё      Ёrametro mv_altsal e mv_funcarg              Ё╠╠ 
+╠╠ЁEduardo Ju  Ё15/03/07  Ё114376ЁAjuste no AcertSX7                          Ё╠╠ 
+╠╠ЁNatie       Ё15/03/07  Ё114376ЁAjuste no alias do altsxb  (SQ3)            Ё╠╠ 
+╠╠ЁEduardo Ju  Ё18/06/07  Ё126268ЁGravacao do RCP na admissao pelo ambiente   Ё╠╠ 
+╠╠Ё            Ё          Ё      ЁRecrutamento e Selecao - RSP.               Ё╠╠ 
+╠╠юддддддддддддаддддддддддаддддддадддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠  
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+/*/
+User Function GPEA010N( nOpcAuto , aRotinaNew )
+
+Local aArea			:= GetArea()
+Local aAreaSRA		:= SRA->( GetArea() )
+Local aIndexSRA		:= {}
+
+Local bBlock
+Local cFiltraSRA
+Local nPos
+Local uRet
+
+Begin Sequence
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁVerifica se o Modulo e Ativo Fixo							   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	IF ( TestaAtf() )
+		Break
+	EndIF
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁAcerta o Dicionario de Dados do SRA para uso no Pyme		   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	IF FindFunction( "Pyme_Dic_Ajust" )
+		Pyme_Dic_Ajust( "SRA" , .F. )
+	EndIF
+
+	//--Acerto do SXB - criacao de consulta do Cargo filtrado por Centro de Custo
+	fAltSxb()
+
+	//здддддддддддддддддддддддддддддддддд©
+	//ЁAjusta validacao do SX3 e SX7     Ё
+	//юдддддддддддддддддддддддддддддддддды
+	AltSX3()
+	
+	AcertSX7()	//Retirar na proxima versao...
+	
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Define Array contendo as Rotinas a executar do programa      Ё
+	Ё ----------- Elementos contidos por dimensao ------------     Ё
+	Ё 1. Nome a aparecer no cabecalho                              Ё
+	Ё 2. Nome da Rotina associada                                  Ё
+	Ё 3. Usado pela rotina                                         Ё
+	Ё 4. Tipo de Transa┤└o a ser efetuada                          Ё
+	Ё    1 - Pesquisa e Posiciona em um Banco de Dados             Ё
+	Ё    2 - Simplesmente Mostra os Campos                         Ё
+	Ё    3 - Inclui registros no Bancos de Dados                   Ё
+	Ё    4 - Altera o registro corrente                            Ё
+	Ё    5 - Remove o registro corrente do Banco de Dados          Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	Private aRotina := {;
+							{ STR0004	, "PesqBrw"		, 0 , 1 },; //"Pesquisar"
+							{ STR0005	, "Gpea010Vis"	, 0 , 2 },; //"Visualizar"
+							{ STR0006	, "Gpea010Inc"	, 0 , 3, 81 },; //"Incluir"
+							{ STR0007	, "Gpea010Alt"	, 0 , 4, 82 },; //"Alterar"
+							{ STR0008	, "Gpea010Del"	, 0 , 5, 3 },;  //"Excluir"
+							{ STR0019	, "GpLegend"	, 0 , 6 },;	//"Legenda"  
+							{ STR0060	,"MsDocument", 0, 4};		//"Conhecimento"
+						}
+	IF ( ValType( aRotinaNew) == "A" ) //Redefinindo aRotina
+		aRotina := aClone( aRotinaNew )
+	EndIF
+	Private bFiltraBrw	:= { || NIL }
+	Private cCadastro	:= OemToAnsi( STR0009 )		//"Cadastro de Funcion═rios"
+	
+	IF ( nOpcAuto <> NIL )
+		
+		aRotSetOpc( "SRA" , NIL , nOpcAuto , .F. )
+		nPos := aScan( aRotina , { |x| x[4] == nOpcAuto } )
+		IF ( nPos == 0 )
+			Break
+		EndIF
+		dbSelectArea( "SRA" )
+		bBlock	:= &( "{ |a,b,c,d,e,f,g| " + aRotina[ nPos , 2 ] + "(a,b,c,d,e,f,g) }" )
+		uRet	:= Eval( bBlock , "SRA" , SRA->( Recno() ) , nPos )
+
+	Else
+	
+		/*
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		Ё Inicializa o filtro utilizando a funcao FilBrowse                      Ё
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды*/
+		cFiltraRh := ChkRh("GPEA010","SRA","1")
+		cFiltraRh += IF(!Empty(cFiltraRh),'.and. RA_CATFUNC # "A"','RA_CATFUNC # "A"')
+		bFiltraBrw := { || FilBrowse("SRA",@aIndexSRA,@cFiltraRH) }
+		Eval( bFiltraBrw )
+		
+		SRA->( dbGoTop() )
+		
+		//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		//Ё Se o GE estiver ativo utilizar a ACmBrowse                     |
+		//Ё devido aos controles de filtro para restriГЦo de visibilidade  Ё
+		//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+		If GetNewPar("MV_ACATIVO",.F.)
+			ACmBrowse( 6 , 1 , 22 , 75 , "SRA" , NIL , NIL , NIL , NIL , NIL , fCriaCor() )
+		Else
+			mBrowse( 6 , 1 , 22 , 75 , "SRA" , NIL , NIL , NIL , NIL , NIL , fCriaCor() )		
+		EndIf			
+
+		/*
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		Ё Deleta o filtro utilizando a funcao FilBrowse                     	 Ё
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды*/
+		EndFilBrw( "SRA" , aIndexSra )
+	
+	EndIF
+	
+End Sequence
+	
+RestArea( aAreaSRA )
+RestArea( aArea )
+
+Return( uRet )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010_01	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё26/01/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁRotina de Visualizacao do Cadastro de Funcionarios			Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁGpea010_01()												Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁVisualizacao do Cadastro de Funcionarios                    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   Ё<void>														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010_01()
+         
+Local aRotinaNew	:= {;
+							{ STR0004	, "PesqBrw"		, 0 , 1 },;	//"Pesquisar"
+				 			{ STR0005	, "Gpea010Vis"	, 0 , 2 },;	//"Visualizar"
+				 			{ STR0019	, "GpLegend"	, 0 , 5 };	//"Legenda"
+			      		}
+Return( GPEA010( NIL , aRotinaNew ) )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010Vis	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё21/01/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁRotina de Visualizacao do Cadastro de Funcionadios			Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>         							Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGPEA010                                                  	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁUndefined													Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010Vis( cAlias , nReg , nOpc , cSraMat , lDlgPadSiga , oDlg , aObjSize )
+
+Local uRetAxVisual
+
+nOpc := 2
+DEFAULT lDlgPadSiga := .F.
+uRetAxVisual := Gpea010Mnt( @cAlias , @nReg , @nOpc , @cSraMat , lDlgPadSiga , oDlg , aObjSize )
+
+Return( uRetAxVisual )
+
+/*/
+зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤┘o    Ё gp010inc Ё Autor Ё Claudecino C Leao     Ё Data Ё 03/09/98 Ё
+цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤┘o Ё Inclusao de Funcionario com atualizacao do arquivo de      Ё
+Ё          Ё tecnicos (AA1)     										Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё fGravaSr9(cCampo)                                          Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       Ё gpa010                                                     Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gp010Inc( cAlias , nReg , nOpc , cSraMat , lDlgPadSiga , oDlg , aObjSize )
+DEFAULT lDlgPadSiga := .T.
+Return( Gpea010Inc( @cAlias , @nReg , @nOpc , @cSraMat , lDlgPadSiga , oDlg , aObjSize ) )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010Inc	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё14/08/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁRotina de Inclusao do Cadastro de Funcionarios				Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>									Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁUndefined													Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010Inc( cAlias , nReg , nOpc , cSraMat , lDlgPadSiga , oDlg , aObjSize )
+nOpc := 3
+DEFAULT lDlgPadSiga := .F.
+Return( Gpea010Mnt( @cAlias , @nReg , @nOpc , @cSraMat , lDlgPadSiga , oDlg , aObjSize ) )
+
+/*/
+зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤┘o    Ё AxAlt010 Ё Autor Ё Jorge Queiroz         Ё Data Ё          Ё
+цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤┘o ЁPrograma generico para alteracao                            Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>                                   Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>                                   Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                    Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function AxAlt010( cAlias , nReg , nOpc , cSraMat , lDlgPadSiga , oDlg , aObjSize )
+DEFAULT lDlgPadSiga := .T.
+Return( Gpea010Mnt( cAlias , nReg , nOpc , @cSraMat , lDlgPadSiga , oDlg , aObjSize ) )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010Alt	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё14/08/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁRotina de Alteracao do Cadastro de Funcionarios				Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>									Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁUndefined													Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010Alt( cAlias , nReg , nOpc , cSraMat , lDlgPadSiga , oDlg , aObjSize )
+nOpc := 4
+DEFAULT lDlgPadSiga := .F.
+Return( Gpea010Mnt( @cAlias , @nReg , @nOpc , @cSraMat , lDlgPadSiga , oDlg , aObjSize ) )
+
+/*/
+зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤┘o    Ё gp010deleЁ Autor Ё Wagner Xavier         Ё Data Ё 13/10/92 Ё
+цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤┘o Ё Programa de exclusao de Funcionarios                       Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё gp010dele(ExpC1,ExpN1,ExpN2)                               Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ ExpC1 = Alias do arquivo                                   Ё
+Ё          Ё ExpN1 = Numero do registro                                 Ё
+Ё          Ё ExpN2 = Numero da opcao selecionada                        Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       Ё gp010Dele                                                  Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gp010dele( cAlias , nReg , nOpc , cSraMat , lDlgPadSiga , oDlg , aObjSize )
+DEFAULT lDlgPadSiga := .T.
+Return( Gpea010Del( @cAlias , @nReg , @nOpc , @cSraMat , lDlgPadSiga , oDlg , aObjSize ) )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010Del	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё14/08/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁRotina de Exclusao do Cadastro de Funcionarios				Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>									Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁUndefined													Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010Del( cAlias , nReg , nOpc , cSraMat , lDlgPadSiga , oDlg , aObjSize )
+nOpc := 5
+DEFAULT lDlgPadSiga := .F.
+Return( Gpea010Mnt( @cAlias , @nReg , @nOpc , @cSraMat , lDlgPadSiga , oDlg , aObjSize ) )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010Mnt	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё04/02/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤┘o Ё Cadastramento de Funcionarios (Manutencao)                 Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁGpea010Mnt( cAlias , nReg , nOpc )							Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁNIL    														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>									Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010Mnt( cAlias , nReg , nOpc , cSraMat , lDlgPadSiga , oDlg , aObjSize )
+
+Local aArea			:= GetArea(Alias())
+Local aSvKeys		:= GetKeys()
+Local aAdvSize		:= {}
+Local aInfoAdvSize	:= {}
+Local aObjCoords	:= {}
+Local bDialogInit	:= { || NIL }
+Local cCpoFil		:= ""
+Local lActivate		:= ( oDlg == NIL )
+Local nLoop			:= 0
+Local nLoops		:= 0
+Local nEpoch		:= Set( _SET_EPOCH , 1910 )	//Altera o Set Epoch para 1910
+Local nOpcA			:= 0
+Local cKeySeek		:= ""
+Local bSkip			:= { || .F. }
+Local aSegmentos	:= {}
+Local aBtn10		:= {} 			// Array que receber o valor Receber o 
+Local lTemItem      := SRA->( FieldPos( "RA_ITEM" ) # 0 )
+Local lTemClVl	    := SRA->( FieldPos( "RA_CLVL" ) # 0 )
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Seta as Variaveis que serao utilizadas por outro Programa                Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+_SetOwnerPrvt(	"aSraFields"	, {} )
+_SetOwnerPrvt(	"aSraAltera" 	, {} )
+_SetOwnerPrvt(	"aSraNaoAlt" 	, {} )
+_SetOwnerPrvt(	"aSraVirtual"	, {} )
+_SetOwnerPrvt(	"aSraVisual" 	, {} )
+_SetOwnerPrvt(	"aSraHeader" 	, {} )
+_SetOwnerPrvt(	"aSraCols" 		, {} )
+_SetOwnerPrvt(	"aSvSraCols"	, {} )
+_SetOwnerPrvt(	"aGpea010Btn"	, {} )
+
+_SetOwnerPrvt(	"bSraSet15"		, { || NIL } )
+_SetOwnerPrvt(	"bSraSet24"		, { || NIL } )
+_SetOwnerPrvt(	"bSraRelRd0" 	, { || NIL } )
+_SetOwnerPrvt(	"bSraShwRel" 	, { || NIL } )	
+
+_SetOwnerPrvt(	"cAltSal"		, Getmv("MV_ALTSAL") )
+
+_SetOwnerPrvt(	"lSraRelRd0" 	, .F. )
+
+_SetOwnerPrvt(	"nGetSX8Len"	, GetSX8Len() )
+_SetOwnerPrvt(	"nRd0Recno"		, 0			  )
+
+_SetOwnerPrvt(	"oEnchSra"		, NIL		  )
+
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Coloca o Ponteiro do Mouse em Estado de Espera                           Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+CursorWait()
+
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Reinicializa __aUniqueKey__ em UniqueKey() utilizada na funcao que  FilЁ
+Ё tra a consulta via tecla <F3> para as Sequencias de Turno RA_SEQTURN   Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+UniqueKey()
+
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+ЁReinicializa as Informacoes em Cache carregadas pela PosSpa() utilizadasЁ
+Ёna verificacao de Regra Valida											 Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+IF FindFunction( "RstPosAlias" )
+	RstPosAlias("SPA")
+EndIF
+
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Inclui novos codigos de Afastamento de acordo com a versao 5.0 da SEFIP  Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+IncAfast()
+
+Begin Sequence
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁCheca a Opcao Selecionada									   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	aRotSetOpc( cAlias , @nReg , nOpc )
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Na Alteracao ou Exclusao Lock do Registro					   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/ 
+	IF ( ( nOpc == 4 ) .or. ( nOpc == 5 ) )
+		IF ( nOpc == 4 )
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁVerifica se esta' alterando um registro da mesma filial               Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			cCpoFil := ( PrefixoCpo(cAlias)+"_FILIAL" )
+			IF ( ( cAlias )->( FieldPos( cCpoFil ) > 0 )  )
+	    		IF ( cAlias )->( FieldGet( FieldPos( cCpoFil ) ) <> xFilial( "SRA" ) )
+	    		    Help(" ",1,"A000FI")
+	    		    Break
+	    		EndIF
+			ENDIF
+		EndIF	
+		IF !( SoftLock( cAlias ) )
+			Break
+		EndIF
+	EndIF
+
+	/*
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Monta a chave para Pesquisa em GdMontaCols                   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды*/
+	If nOpc==4 
+		cKeySeek:= ( &(cCpoFil) + SRA->RA_MAT ) 
+		bSkip 	:= { ||  &("RA_FILIAL")+ &("RA_MAT") <> cKeySeek }
+	Endif 	
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Monta os Dados para a Enchoice							   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/ 
+	aSraCols	:= SRA->( GdBuildCols( @aSraHeader , @nLoops , @aSraVirtual , @aSraVisual,,,,,,, bSkip ) ) 
+	aSvSraCols	:= aClone( aSraCols )
+	
+	/*/ 
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Cria as Variaveis de Memoria e Carrega os Dados Conforme o arЁ
+	Ё quivo														   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	For nLoop := 1 To nLoops 
+		aAdd( aSraFields , aSraHeader[ nLoop , 02 ] )
+		IF ( lActivate )
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			Ё Seta as Variaveis que serao utilizadas aa partir deste Ponto             Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			SetMemVar( aSraHeader[ nLoop , 02 ] , aSraCols[ 01 , nLoop ] , .T. )
+		Else
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			Ё Seta as Variaveis que serao utilizadas por outro Programa                Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			_SetOwnerPrvt( aSraHeader[ nLoop , 02 ] , aSraCols[ 01 , nLoop ] )
+		EndIF
+	Next nLoop
+
+	/*/ 
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Verifica se Pode Excluir o Funcionario                       Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	IF ( nOpc == 5 )
+		IF !( Gpea010ChkDel( cAlias , nReg , nOpc , GetMemVar( "RA_MAT" ) ) )  .or. ;
+		   !Gpea010Excl() 
+			Break
+		EndIF
+	EndIF
+	
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁQuando for Visualizacao, Inclusao ou Alteracao                Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	IF ( ( nOpc == 2 ) .or. ( nOpc == 3 ) .or. ( nOpc == 4 ) )
+
+		/*/
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		ЁApenas na Inclusao ou Alteracao                               Ё
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+		IF ( ( nOpc == 3 ) .or. ( nOpc == 4 ) )
+		
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁDefine os Campos Editaveis na Enchoice                        Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			nLoops := Len( aSraVisual )
+			For nLoop := 1 To nLoops
+				aAdd( aSraNaoAlt , aSraVisual[ nLoop ] )
+			Next nLoop
+	    	IF ( nOpc == 4 ) //Alteracao
+	    		/*/
+				здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+				Ё As alteracoes de Matricula e Centro de Custo deverao ser  feiЁ
+				Ё tas pelo programa de transferencia         				   Ё
+				юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	    		aAdd( aSraNaoAlt , "RA_MAT"		)
+	    		aAdd( aSraNaoAlt , "RA_CC" 		)
+	    		If lTemItem .and. lTemClVl
+		    		aAdd( aSraNaoAlt , "RA_ITEM")
+		    		aAdd( aSraNaoAlt , "RA_CLVL")
+				EndIf
+				/*/
+				здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+				Ё As alteracoes de Turno de Trabalho,Sequencia e Regra  deveraoЁ
+				Ё ser feitas pelo programa de Trocas de Turno Quando Forem   vaЁ
+				Ё lidos														   Ё
+				юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+				IF (; 
+						IsMemVar( "RA_TNOTRAB" ) .and. ;
+						IsMemVar( "RA_SEQTURN" ) .and. ;
+						IsMemVar( "RA_REGRA"   )	   ;
+					)
+						IF (;
+								PosSPA( GetMemVar( "RA_REGRA" ) , xFilial("SRA") , NIL , RetOrdem("SPA","PA_FILIAL+PA_CODIGO") , .F. ) .and. ;
+								Gpea010SeqVld( .F. , .T. );
+							)	
+						aAdd( aSraNaoAlt , "RA_TNOTRAB" )
+						aAdd( aSraNaoAlt , "RA_SEQTURN" )
+						aAdd( aSraNaoAlt , "RA_REGRA"   )
+					EndIF
+				EndIF	
+	    	EndIF
+			nLoops := Len( aSraFields )
+			For nLoop := 1 To nLoops
+				IF ( aScan( aSraNaoAlt , { |cNaoA| cNaoA == aSraFields[ nLoop ] } ) == 0 )
+					aAdd( aSraAltera , aSraFields[ nLoop ] )
+				EndIF
+			Next nLoop
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁSe Existir o Arquivo de Relacionamento com o RD0 DisponibilizaЁ
+			ЁBotao														   Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			IF BldArrRdZRel()
+				/*/
+				здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+				Ё Define o Botao para Efetuar Relacionamentos com o RD0		   Ё
+				юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+				bSraRelRd0 := { ||	CursorWait(),;
+									lSraRelRd0 := SraRelRd0( @nRd0Recno , aSraHeader , .T. , NIL ),;
+									SetKey( VK_F4 , bSraRelRd0 ),;
+									CursorArrow();
+						   	  }
+				aAdd(;
+	  					aGpea010Btn	,;
+	  									{;
+	  										"DESTINOS_OCEAN"					,;
+	  			   							bSraRelRd0							,;
+	  			       	   					OemToAnsi( STR0037 + "...<F4>"  )	,;	//"Relacionar" 
+	  			       	   					OemToAnsi( STR0038				)	 ;	//"Relac."
+	  			           				};
+	  			     )
+			EndIF
+		
+		EndIF
+
+		/*/
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		ЁSe Existir o Arquivo de Relacionamento com o RD0 DisponibilizaЁ
+		ЁBotao														   Ё
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+		IF BldArrRdZRel()
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			Ё Define o Botao para Visualizar Relacionamentos com o RD0	   Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	  			bSraShwRel := { ||	CursorWait(),;
+	  								SraShwRel( @nRd0Recno ),;
+	  								SetKey( VK_F5 , bSraShwRel ),;
+	  								CursorArrow();
+	  					   	  }
+	  			aAdd(;
+	  					aGpea010Btn	,;
+	  									{;
+	  										"ANALITICO"							,;
+	  			   							bSraShwRel							,;
+	  			       	   					OemToAnsi( STR0039 + "...<F5>"  )	,;	//"Visualizar Relacionamento"
+	  			       	   					OemToAnsi( STR0040				)	 ;	//"Vis.Relac."
+	  			           				};
+	  			     )
+		EndIF	
+	EndIF
+
+	IF ( lActivate )
+
+		/*/
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		Ё Monta as Dimensoes dos Objetos         					   Ё
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+		DEFAULT lDlgPadSiga	:= .F.
+		aAdvSize		:= MsAdvSize( NIL , lDlgPadSiga )
+		aInfoAdvSize	:= { aAdvSize[1] , aAdvSize[2] , aAdvSize[3] , aAdvSize[4] , 0 , 0 } 
+		aAdd( aObjCoords , { 015 , 000 , .T. , .T. } )
+		aObjSize		:= MsObjSize( aInfoAdvSize , aObjCoords )
+
+	EndIF
+	
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁDefine o Bloco para <CTRL-O> ( Button OK )                    Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	bSraSet15 := { || IF(; 
+								( ( nOpc == 3 ) .or. ( nOpc == 4 ) );				//Inclusao ou Alteracao
+								.and.;
+								If(( nOpc == 3 ),Gpea010RunValid(),.T.);									// Executa o valide do campo RA_MAT
+								.and.;
+								Obrigatorio( oEnchSra:aGets , oEnchSra:aTela );		//Verifica os Campos Obrigatoris na Enchoice
+								.and.;	
+								Gpea010SeqVld();									//Verifica a Sequencia do Turno
+								.and.;
+								Gpea010ValPE();										//Verifica a execucao do ponto de entrada Gp010ValPE
+								.and.;
+								IF( ( nOpc == 3 ) , PcoVldLan('000084','01','GPEA010') , IIF( nOpc == 4,PcoVldLan('000084','03','GPEA010'),.T.) ) .and. ;
+								IF( ( nOpc == 4 ) , Gp010AltSal() , .T. ),;			//Verifica a Alteracao Salarial
+								(;
+									nOpcA := 1 ,;
+									RestKeys( aSvKeys , .T. ),;
+									oDlg:End();
+							 	),;
+							 	IF(; 
+							 		( ( nOpc == 3 ) .or. ( nOpc == 4 ) ) ,;			//Inclusao ou Visualizacao
+							 			(;
+							 				nOpcA := 0 ,;
+							 				.F.;
+							 			 ),;
+									(;
+										nOpcA := IF( nOpc == 2 , 0 , 1 ) ,;			//Visualizacao ou Exclusao
+										RestKeys( aSvKeys , .T. ),;
+										oDlg:End();
+							 		);
+							 	  );
+						   );
+				 }
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁDefine o Bloco para <CTRL-X> ( Button Cancel )                Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	bSraSet24	:= { || oDlg:End() } 
+    
+	/*
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁVerifica se o Gestao Educacional esta ativo, para neste caso, Ё
+	Ёapresentar botao de selecao de segmentos                      Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	*/
+	If GetNewPar("MV_ACATIVO",.F.) .And. nModulo == 49 //Gestao Educacional
+		If SubStr(GetNewPar("MV_ACVISIB", "222222"),1,1) == "1"
+			aAdd(aGpea010Btn, {'WEB', {|| aSegmentos := ACAM060() } , STR0059 , STR0059 } ) //"Segmentos" ## "Segmentos"
+		endif
+	Endif
+    // Inclusao de botoes na toobar  
+	If ExistBlock("GPE10BTN")
+		aBtn10:=ExecBlock("GPE10BTN",.F.,.F.)
+		If Valtype(aBtn10)="A".AND.Len(aBtn10)>=2 //Garante que tenha o icone do botao e a funГЦo a ser executada
+			aadd(aGpea010Btn,aBtn10)
+		EndIf	
+	EndIf	
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Monta Bloco para o Init do Dialog     					   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	bDialogInit := { || EnchoiceBar( oDlg , bSraSet15 , bSraSet24 , NIL , aGpea010Btn )	,;
+						SetKey( VK_F4 , bSraRelRd0 ) 								,;
+						SetKey( VK_F5 , bSraShwRel )  							 	 ;
+					}
+
+	/*
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Admissao do Candidato pelo Ambiente Recrutamento e Selecao   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды*/
+	If cModulo == "RSP"	   
+		fRSM001DeP()	//Preenche as variaveis de memoria (SRA) c/ as informacoes do candidato (SQG)
+	EndIf
+
+	/*/ 
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Monta o Dialogo Principal                                    Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	IF ( lActivate )
+		DEFINE MSDIALOG oDlg TITLE OemToAnsi( cCadastro ) From aAdvSize[7],0 TO aAdvSize[6],aAdvSize[5] OF oMainWnd PIXEL 
+	EndIF	
+	oEnchSra	:= MsmGet():New( "SRA" , nReg , nOpc , NIL , NIL , NIL , aSraFields , aObjSize[1] , aSraAltera , NIL , NIL , NIL , oDlg , NIL , .F. , NIL , .F. )
+	IF ( lActivate )
+		ACTIVATE MSDIALOG oDlg ON INIT Eval( bDialogInit ) CENTERED
+	EndIF	
+	
+End Sequence
+
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Coloca o Ponteiro do Mouse em Estado de Espera                           Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+CursorWait()
+    
+	PcoIniLan("000084")
+	
+	IF ( lActivate )
+		//Se o parametro para o modulo GE estiver ativo, carrega o conteudo de uma variavel privada
+		//para uma local, e trabalha com esta a partir deste ponto
+		If nOpc == 5  //exclusao
+		    If nOpca == 1
+				PcoDetLan("000084","01","GPEA010", .T.)
+				PcoDetLan("000084","02","GPEA010", .T.)
+				PcoDetLan("000084","03","GPEA010", .T.)
+			EndIf	
+		EndIf	
+		Gpea010Put( cAlias , nOpc , nReg , nOpcA , @cSraMat, aSegmentos )
+		/*/
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		ЁUnLock do Registro do SRA 									 Ё
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+		SRA->( MsUnLock() )
+	   If nOpca == 1
+			If nOpc == 3 //inclusao e alteracao
+				PcoDetLan("000084","01","GPEA010")
+	 		ElseIf nOpc == 4 
+				PcoDetLan("000084","03","GPEA010")
+			EndIf	
+		EndIf	
+	EndIF
+    
+	PcoFinLan("000084")
+	PcoFreeBlq("000084")
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁRestaura a Area de Entrada									 Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	RestArea( aArea )
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁRetornar Set Epoch Padrao									 Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	Set( _SET_EPOCH , nEpoch )
+
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Restaura o Ponteiro do Mouse 											   Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+CursorArrow()
+
+Return( nOpcA )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010Put	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё10/09/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁGrava as Informacoes do SRA e Verifica Relacionamento com  oЁ
+Ё          ЁRD0/RDZ														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>     								Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁNIL    														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>									Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010Put( cAlias , nOpc , nReg , nOpcA , cSraMat, aSegmentos )
+
+Local lGrv := .F.
+
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+ЁCarrega a Matricula que sera retornada por Referencia         Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+cSraMat := GetMemVar( "RA_MAT" )
+
+IF ( nOpcA == 1 )
+
+	Begin Transaction Extended 
+
+		/*/
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		ЁEfetua Gravacao ou Exclusao no SRA                            Ё
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+		lGrv	:= Gpea010Grv( cAlias , nOpc , nReg , aSraCols , aSraHeader , aSraVirtual , aSvSraCols , lSraRelRd0 , nRd0Recno )
+
+	End Transaction Extended
+
+	If lGrv 
+		//зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		//ЁSe o mСdulo GestЦo de Acervos estiver sendo utilizado gerar o funcionАrioЁ
+		//Ёcomo um usuАrio do Acervo.                                               Ё
+		//юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+		If GetNewPar("MV_GACATIV",.F.)
+			GacxInteg( nOpc, "SRA", SRA->(Recno()) )
+		Endif
+		//зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		//ЁSe o mСdulo GestЦo Educacional estiver sendo utilizado gravar os segmen- Ё
+		//Ёtos a que pertencem os funcionarios para o controle de visibilidade      Ё
+		//юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+		If GetNewPar("MV_ACATIVO",.F.)
+			Acm060Gpe( nOpc, aSegmentos, "JHI", "JHI_MATFUN", M->RA_MAT )
+		Endif
+	EndIf		
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	ЁMonta Array com  os dados para envio de e-mail              Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+	/*/
+	IF ( lGrv ) .And. nOpc == 3
+		fMontaMail( "016" )
+	EndIF
+
+ElseIF (;
+			( nOpcA == 0 );
+			.and.;
+			( nOpc == 3 );
+		)
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё Se nao Gravou funcionario mas fez relacionamento, retira-o   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	IF ( ExistePessoa( "SRA" , xFilial("SRA") + GetMemVar( "RA_MAT" ) , cEmpAnt , cFilAnt , .T. ) )
+		IF !( SRA->( MsSeek( xFilial("SRA") + GetMemVar( "RA_MAT" ) , .F. ) ) )
+			UndoRelRdz( "SRA" , RD0->RD0_CODIGO , cEmpAnt , cFilAnt )
+		EndIF
+	EndIF
+
+	/*/
+	здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+	Ё RollBack da Numeracao Automatica            				   Ё
+	юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+	While ( GetSX8Len() > nGetSX8Len )
+		RollBackSX8()
+	End While
+
+EndIF
+
+Return( lGrv )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010Grv	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё04/02/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁGrava as Informacoes no SRA e suas correlacoes     		    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>     								Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁNIL    														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>									Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010Grv(	cAlias			,;
+							nOpc			,;
+							nReg			,;
+							aSraCols		,;
+							aSraHeader		,;
+							aSraVirtual		,;
+							aSvSraCols		,;
+							lSraRelRd0		,;
+							nRd0Recno		 ;
+						  )
+/*/
+зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Variaveis de Inicializacao Obrigatoria					  Ё
+юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Local aMestre		:= GdPutIStrMestre( 01 )
+Local cOpcao		:= IF( ( nOpc == 5 ) , "DELETE" , IF( ( ( nOpc == 3 ) .or. ( nOpc == 4 ) ) , "PUT" , NIL ) )
+Local nSraRdzOrd	:= GetRdzIndRel( "SRA" )
+
+/*/
+зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Variaveis que serao inicializadas no Corpo da Funcao		  Ё
+юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Local cRd0Codigo
+Local cLastCodRd0
+Local lGrava
+Local nLoop
+Local nLoops
+
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Altera o Estado do Cursor  								   Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+CursorWait()
+
+	Begin Sequence
+
+		/*/
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		Ё Atualiza aRdmCols para Verificar se Houveram Alteracoes	   Ё
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+		nLoops := Len( aSraHeader )
+		For nLoop := 1 To nLoops
+			aSraCols[ 01 , nLoop ] := GetMemVar( aSraHeader[ nLoop , 02 ] )
+		Next nLoop
+
+		IF !( lGrava := ( ( nOpc == 5 ) .or. !fCompArray( aSraCols , aSvSraCols ) ) )
+			Break
+		EndIF
+
+		aMestre[ 01 , 01 ]	:= cAlias
+		aMestre[ 01 , 02 ]	:= nReg
+		aMestre[ 01 , 03 ]	:= lGrava
+		aMestre[ 01 , 04 ]	:= aClone( aSraHeader )
+		aMestre[ 01 , 05 ]	:= aClone( aSraVirtual )
+		aMestre[ 01 , 06 ]	:= {}
+		aMestre[ 01 , 07 ]	:= {}
+
+		IF ( nOpc == 3 ) //Inclusao
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			Ё Inclui as Informacoes                        	   			   Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			GdPutInfoData( aMestre , cOpcao , .F. )
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			Ё Inicializa o conteudo do campo RA_MSBLQL     	   			   Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			IF SRA->( RecLock( "SRA" , .F. ) )
+				SRA->RA_MSBLQL := "2"
+				SRA->( MsUnLock() )
+			EndIF	
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁEfetua Gravacao do SRF                                        Ё
+			ЁEm toda inclusao sera gerado automaticamento um registro   no Ё
+			ЁSRF, com Filial, Matricula e data de admissao do SRA          Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			IF Reclock( "SRF" , .T. )
+				SRF->RF_FILIAL 	:= SRA->RA_FILIAL
+				SRF->RF_MAT		:= SRA->RA_MAT
+				SRF->RF_DATABAS	:= SRA->RA_ADMISSA 
+				SRF->( MsUnLock() )
+			EndIF	
+	
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁGrava Turno e Sequencia Inicial no SPF                        Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			IF (;
+					IsMemVar( "RA_ADMISSA" ) .and. ;
+					IsMemVar( "RA_TNOTRAB" ) .and. ;
+					IsMemVar( "RA_SEQTURN" ) .and. ;
+					IsMemVar( "RA_REGRA"   )       ;
+				)
+				/*/
+				здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+				ЁApenas se forem validos                                       Ё
+				юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+				IF (;
+						PosSPA( SRA->RA_REGRA , xFilial("SRA") , NIL , RetOrdem("SPA","PA_FILIAL+PA_CODIGO") , .F. ) .and. ;
+						Gpea010SeqVld( .F. , .T. );
+					)	
+					SRA->( Gpea010SPFGrv( RA_FILIAL , RA_MAT , RA_ADMISSA , RA_TNOTRAB , RA_SEQTURN , RA_REGRA ) )
+				EndIF	
+			EndIF
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁCria se senha do funcinario para o Brasil quando estiver vazia  Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			fSraSenha()
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁObtem o Codigo do RD0                                       Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			IF ( lSraRelRd0 )
+				RD0->( MsGoto( nRd0Recno ) )
+				cRd0Codigo := RD0_CODIGO
+			Else
+				Rd0GetCodigo( @cRd0Codigo , .F. )
+			EndIF
+	
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁAtualiza Cadastro de Pessoas                        		 Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			EntUpdateRd0(	cRd0Codigo							,;	//01 -> Codigo da Pessoa
+							"SRA"								,;	//02 -> Entidade Relacionada
+							xFilial("SRA")+GetMemVar("RA_MAT")	,;	//03 -> Chave da Entidade
+							nSraRdzOrd							,;	//04 -> Ordem
+							SRA->( Recno() )					,;	//05 -> Recno da Entidade
+							cEmpAnt								,;	//06 -> Codigo da Empresa
+							cFilAnt								,;	//07 -> Codigo da Filial
+							"1"					 				,;	//06 -> Conteudo para o RD0_TIPO "1"=Interno;"2"=Externo
+							.F.				 					,;	//07 -> Se Atualiza as Entidades Relacionadas
+							NIL									,;	//10 -> Array com as Entidades para o Before Update
+							NIL					 				 ;	//11 -> Se Executa algo depois do Update
+						 )
+	
+	    ElseIF ( nOpc == 4 )	//Alteracao
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁVerifica se Houve alteracao Salarial Funcao ou Categoria	 Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			IF (;
+					IsMemVar( "RA_SALARIO" ) .and. ;
+					IsMemVar( "RA_CODFUNC" ) .and. ;
+					IsMemVar( "RA_CATFUNC" ) .and. ;
+					IsMemVar( "RA_CARGO"   ) .and. ;
+					IsMemVar( "RA_ANTEAUM" ) 	   	;
+				)
+				IF (;
+						( GdFieldGet( "RA_SALARIO" , 1 , .F. , aSraHeader , aSvSraCols ) <> GetMemVar( "RA_SALARIO" ) ) .or. ;
+						( GdFieldGet( "RA_CODFUNC" , 1 , .F. , aSraHeader , aSvSraCols ) <> GetMemVar( "RA_CODFUNC" ) ) .or. ;
+						( GdFieldGet( "RA_CATFUNC" , 1 , .F. , aSraHeader , aSvSraCols ) <> GetMemVar( "RA_CATFUNC" ) ) .or. ;
+						( GdFieldGet( "RA_CARGO"   , 1 , .F. , aSraHeader , aSvSraCols ) <> GetMemVar( "RA_CARGO"   ) .and. SR7->( Type("R7_CARGO") ) # "U"  ) .or. ;
+						( GdFieldPos( "RA_ANTEAUM" , aSraHeader)>0 .AND. GdFieldGet( "RA_ANTEAUM" , 1 , .F. , aSraHeader , aSvSraCols ) <> GetMemVar( "RA_ANTEAUM" ) .and. SR3->( Type("R3_ANTEAUM") ) # "U" )	   ;
+					)	
+					/*/
+					здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+					ЁGarante o Posicionamento no Recno de Entrada            	 Ё
+					юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+					SRA->( MsGoto( nReg ) )
+					/*/
+					здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+					ЁGrava as Informacoes no SR3 e SR7                       	 Ё
+					юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+					fGravaSr3()
+				EndIF
+			EndIF				
+	
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁGrava as Alteracoes dos Campos no SR9 (Historico)           Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			nLoops := Len( aSraHeader )
+			For nLoop := 1 To nLoops
+				IF !( Alltrim( aSraHeader[ nLoop , 02 ] ) $ "RA_SALARIO*RA_CODFUNC*RA_CATFUNC*RA_AFASFGT*RA_SITFOLH" )
+					fGravaSr9( aSraHeader[ nLoop , 02 ] , aSraCols[ 01 , nLoop ] , aSvSraCols[ 01 , nLoop ] )
+				EndIF	
+			Next nLoop
+	
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁAtualiza o Cadastro de Participantes                        Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			IF ( lSraRelRd0 )
+				RD0->( MsGoto( nRd0Recno ) )
+				cRd0Codigo	:= RD0->RD0_CODIGO
+				/*/
+				здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+				ЁVerifica se Esta alterando Relacionamento Existente         Ё
+				юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+				cLastCodRd0 := fGetPessoa( "SRA" , ( xFilial( "SRA" ) + GetMemVar( "RA_MAT" ) ) , cEmpAnt , cFilAnt )
+				IF ( cRd0Codigo <> cLastCodRd0 )
+					/*/
+					здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+					ЁExclui o Antigo Relacionamento                              Ё
+					юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+					UndoRelRdz( "SRA" , cLastCodRd0 , cEmpAnt , cFilAnt )
+				EndIF
+			Else 
+				cRd0Codigo := fGetPessoa( "SRA" , ( xFilial( "SRA" ) + GetMemVar( "RA_MAT" ) ) , cEmpAnt , cFilAnt )
+			EndIF
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			Ё Grava as Informacoes                        	   			   Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			GdPutInfoData( aMestre , cOpcao , .F. )
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁAtualiza Cadastro Pessoas x Entidades                       Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/ 
+			IF !Empty( cRd0Codigo ) 
+				EntUpdateRd0(	cRd0Codigo							,;	//01 -> Codigo da Pessoa
+								"SRA"								,;	//02 -> Entidade Relacionada
+								( xFilial( "SRA" ) + SRA->RA_MAT )	,;	//03 -> Chave da Entidade
+								nSraRdzOrd							,;	//04 -> Ordem
+								nReg								,;	//05 -> Recno da Entidade
+								cEmpAnt								,;	//06 -> Codigo da Empresa
+								cFilAnt								,;	//07 -> Codigo da Filial
+								"1"									,;	//08 -> Conteudo para o RD0_TIPO "1"=Interno;"2"=Externo
+								.F.									,;	//09 -> Se Atualiza as Entidades Relacionadas
+								NIL									,;	//10 -> Array com as Entidades para o Before Update
+								NIL					 				 ;	//11 -> Se Executa algo depois do Update
+					  		)
+			EndIF
+
+			/*/ 
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁGrava Turno e Sequencia Inicial no SPF                        Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			IF (;
+					IsMemVar( "RA_ADMISSA" ) .and. ;
+					IsMemVar( "RA_TNOTRAB" ) .and. ;
+					IsMemVar( "RA_SEQTURN" ) .and. ;
+					IsMemVar( "RA_REGRA"   )       ;
+				)
+				/*/ 
+				здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+				ЁApenas se forem validos                                       Ё
+				юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+				IF (;
+						PosSPA( SRA->RA_REGRA , xFilial("SRA") , NIL , RetOrdem("SPA","PA_FILIAL+PA_CODIGO") , .F. ) .and. ;
+						Gpea010SeqVld( .F. , .T. );
+					)	
+					SRA->( Gpea010SPFGrv( RA_FILIAL , RA_MAT , dDataBase , RA_TNOTRAB , RA_SEQTURN , RA_REGRA ) )
+				EndIF
+			EndIF
+			// Integracao Medicina e Seguranca do Trabalho
+        	If FindFunction("MdtAltFicha")
+				MdtAltFicha(xFilial("SRA"),SRA->RA_MAT,M->RA_CODFUNC,M->RA_CC)
+			EndIF
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁCria se senha do funcinario para o Brasil quando estiver vazia  Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			fSraSenha()
+			
+	    ElseIF ( nOpc == 5 )	//Exclusao
+		
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			Ё Exclui somente Relacionamento (RDZ)                          Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			cLastCodRd0 := fGetPessoa( "SRA" , ( xFilial( "SRA" ) + GetMemVar( "RA_MAT" ) ) , cEmpAnt , cFilAnt )
+			UndoRelRdz( "SRA" , cLastCodRd0 , cEmpAnt , cFilAnt )
+
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			Ё Exclui as Informacoes                        	   			   Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			GdPutInfoData( aMestre , cOpcao , .F. )
+
+	    EndIF
+
+		/*/
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		ЁRealiza a gravacao do responsavel no arquivo utilizado  |
+		|pelos modulos do Quality Celerina, caso haja integracao.|
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+		IF ( ( nOpc == 3 ) .or. ( nOpc == 4 ) ) //Incluao ou Alteracao
+			Qa_Quality()
+		EndIF	
+	
+		/*/
+		здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+		Ё Confirmando a Numeracao Automatica          				   Ё
+		юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+		IF ( nOpc == 3 )
+			While ( GetSX8Len() > nGetSX8Len )
+				ConfirmSX8()
+			End While
+		EndIF
+
+	End Sequence
+		
+/*/
+здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+Ё Restaura o Estado do Cursor								   Ё
+юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+CursorArrow()
+
+Return( lGrava )
+
+/*/
+зддддддддддбдддддддддддддбдддддбддддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤┘o    ЁGpea010ChkDelЁAutorЁMarinaldo de Jesus    Ё Data Ё04/02/2004Ё
+цддддддддддедддддддддддддадддддаддддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤┘o ЁVerifica se os Registros podem ser Deletados                Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<Vide Parametros Formais>									Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<Vide Parametros Formais>									Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGpea010()	                                                Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010ChkDel(	cAlias		,;	//Alias do Arquivo Principal
+								nReg		,;	//Recno do Arquivo Principal
+								nOpc		,;	//Opcao do Arquivo Principal
+								cCodigo		 ;	//Chave para Exclusao (Sem a Filial)
+							   )
+
+Local aAreas		:= {}
+Local cKeyDel		:= ""
+Local lChkDelOk 	:= .T.
+Local nAreas		:= 0
+
+DEFAULT cAlias		:= Alias()
+DEFAULT nReg		:= ( cAlias )->( Recno() )
+DEFAULT nOpc		:= 5
+DEFAULT cCodigo		:= ""
+
+//SRE
+aAdd( aAreas , Array( 04 ) )
+nAreas := Len( aAreas )
+aAreas[nAreas,01] := SRE->( GetArea() )
+aAreas[nAreas,02] := {}
+aAreas[nAreas,03] := 0
+aAreas[nAreas,04] := { |aLog| DelChkTransf( nReg , @aLog ) }
+
+//SRC
+aAdd( aAreas , Array( 03 ) )
+nAreas := Len( aAreas )
+aAreas[nAreas,01] := SRC->( GetArea() )
+aAreas[nAreas,02] := {"RC_FILIAL","RC_MAT"}
+aAreas[nAreas,03] := RetOrdem( "SRC" , "RC_FILIAL+RC_MAT" , .T. )
+
+( cAlias )->( MsGoto( nReg ) )
+cKeyDel	:= cCodigo
+
+lChkDelOk  := ChkDelRegs(	cAlias				,;	//Alias do Arquivo Principal
+							nReg				,;	//Registro do Arquivo Principal
+							nOpc				,;	//Opcao para a AxDeleta
+							xFilial( cAlias )	,;	//Filial do Arquivo principal para Delecao
+							cKeyDel				,;	//Chave do Arquivo Principal para Delecao
+							aAreas				,;	//Array contendo informacoes dos arquivos a serem pesquisados
+							NIL					,;	//Mensagem para MsgYesNo
+							NIL					,;	//Titulo do Log de Delecao
+							NIL					,;	//Mensagem para o corpo do Log
+							.F.				 	,;	//Se executa AxDeleta
+							.T.     			,;	//Se deve Mostrar o Log
+							NIL					,;	//Array com o Log de Exclusao
+							NIL				 	 ;	//Array com o Titulo do Log
+						)
+						
+
+Return( lChkDelOk  )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁDelChkTransf  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё05/02/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁVerifica se Existem Transferencias para o Funcionario	    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>     								Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁNIL    														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>									Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function DelChkTransf( nReg , aLog )
+
+Local lDelOk := .T.
+
+SRA->( MsGoto( nReg ) )
+IF !( lDelOk := !( fTransf( NIL , NIL , NIL , NIL , NIL , NIL , NIL ,.T. ) ) )
+	aAdd( aLog , "SRE" + "     " + STR0051 )	//"Existem Transferencias para o Funcionario"
+EndIF
+
+Return( lDelOk )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁSraRelRd0 	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё05/02/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁAtualiza o SR9 com as Alteracoes efetuadas pelo RD0		    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>     								Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁNIL    														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>									Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function SraRelRd0( nRd0Recno , aHeader , lChkPessoa , cLstCodRd0 )
+
+Local aSvKeys		:= GetKeys()
+Local aArea 		:= GetArea()
+Local aAreaRD0		:= RD0->( GetArea() )
+Local aAreaSRA		:= SRA->( GetArea() )
+Local cProcName3	:= Upper( AllTrim( ProcName( 3 ) ) )
+Local cProcName5	:= Upper( AllTrim( ProcName( 5 ) ) )
+Local cMsgErr		:= ""
+Local lSraRelRd0	:= .F.
+Local lUndoRelRdz	:= .F.
+Local nSraRdzOrd	:= GetRdzIndRel( "SRA" )
+
+Local cCic
+Local cSeek
+Local nSvRecno
+
+DEFAULT lChkPessoa := .T.
+
+nRd0Recno := 0
+
+Begin Sequence
+
+	IF 	(;
+			!( "GPEA010MNT" $ ( cProcName3 + cProcName5 ) );
+			 .and.;
+			!( "TRM100ROT"  $ ( cProcName3 + cProcName5 ) );
+		)	
+		Break
+	EndIF
+
+	IF Empty( GetMemVar( "RA_MAT" ) )
+		MsgInfo( OemToAnsi( STR0052 ) )	//"Preencha o cСdigo da MatrМcula"
+		Break
+	EndIF
+
+	IF ( lChkPessoa )
+		IF ( ExistePessoa( "SRA" , xFilial("SRA") + GetMemVar( "RA_MAT" ) , cEmpAnt , cFilAnt , .T. ) )
+			nLstRecRd0 := RD0->( Recno() )
+			cLstCodRd0 := RD0->RD0_CODIGO
+			IF !( lSraRelRd0 := MsgNoYes( OemToAnsi( STR0042 ) ) )	//"J═ existe relacionamento para este funcion═rio. Deseja alter═-lo?"
+				Break
+			EndIF
+		EndIF
+	EndIF	
+
+	IF ( IsMemVar( "RA_CIC" ) )
+		cCic := GetMemVar( "RA_CIC" )
+        IF !Empty( cCic )
+			RD0->( dbSetOrder( RetOrdem( "RD0" , "RD0_FILIAL+RD0_CIC" ) ) )
+			cSeek := ( xFilial( "RD0" , xFilial("SRA") ) + cCic )
+			IF RD0->( dbSeek( cSeek , .F. ) )
+				nSvRecno := RD0->( Recno() ) 
+				IF ( RD0->RD0_MSBLQL <> "2" )
+					While RD0->( !Eof() .and. ( cSeek == RD0_FILIAL + RD0_CIC ) )
+						IF ( RD0->RD0_MSBLQL == "2" )
+							nSvRecno := RD0->( Recno() )
+							Exit
+						EndIF
+						RD0->( dbSkip() )
+					End While
+				EndIF
+				RD0->( MsGoto( nSvRecno ) )
+				//"O participante/A Pessoa "###"possui o mesmo numero de "###"criar relacionamento?"
+				IF ( lSraRelRd0 := MsgYesNo( OemToAnsi( STR0043  + " " + AllTrim( RD0->RD0_NOME ) + " " + STR0044 + aHeader[GdFieldPos("RA_CIC",aHeader),01] + " " + STR0045 ) ) )
+					nRd0Recno := nSvRecno
+					RD0->( dbSetOrder( RetOrdem( "RD0" , "RD0_FILIAL+RD0_CODIGO" ) ) )
+					Break
+				EndIF
+			EndIF 	
+			RD0->( dbSetOrder( RetOrdem( "RD0" , "RD0_FILIAL+RD0_CODIGO" ) ) )
+		EndIF
+	EndIF
+
+	IF ( lSraRelRd0 := ConPad1( NIL , NIL , NIL , "RD0" , NIL , NIL , .F. ) )
+
+		nRd0Recno := RD0->( Recno() )
+		IF ( RdzExisteRel( "SRA" , RD0->RD0_CODIGO , cEmpAnt , cFilAnt , .T. ) )
+			IF ( cLstCodRd0 == RD0->RD0_CODIGO )
+				Break
+			EndIF
+			//"O participante/A Pessoa "###"j═ est═ relacionado(a) a outro funcion═rio. Deseja relacionar uma outra pessoa?"
+			IF !( lSraRelRd0 := MsgYesNo( OemToAnsi( STR0043 + " " +  STR0046 ) ) )
+				nRd0Recno := 0
+				Break
+			EndIF
+			lSraRelRd0 := SraRelRd0( @nRd0Recno , aHeader , .F. , cLstCodRd0 )
+			Break
+		EndIF
+
+		IF !Empty( cCic ) .and. !Empty( RD0->RD0_CIC )
+			IF ( AllTrim( cCic ) <> AllTrim( RD0->RD0_CIC ) )
+				//"O nёmero do"###"do participante/pessoa selecionado ┌ diferente do nёmero do"###"funcion═rio."###"Deseja continuar?"
+				IF !( lSraRelRd0 := MsgNoYes( OemToAnsi( STR0047 + " " + aHeader[GdFieldPos("RA_CIC",aHeader),01] + STR0048 + " " + aHeader[GdFieldPos("RA_CIC",aHeader),01] + STR0049 + " " + STR0050 ) ) )
+					Break
+				EndIF
+			EndIF
+		EndIF
+
+	EndIF
+
+End Sequence
+
+CursorWait()
+
+	IF !Empty( nRd0Recno )
+		RD0->( MsGoto( nRd0Recno ) )
+		IF (;
+				!Empty( cLstCodRd0 );
+				.and.;
+				( cLstCodRd0 <> RD0->RD0_CODIGO );
+			)	
+			/*/
+			здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+			ЁExclui o Antigo Relacionamento                              Ё
+			юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+			lUndoRelRdz := UndoRelRdz( "SRA" , cLstCodRd0 , cEmpAnt , cFilAnt , .T. , @cMsgErr )
+		EndIF
+		RD0->( MsGoto( nRd0Recno ) )
+		IF Empty( cMsgErr )
+			IF ( Empty( cLstCodRd0 ) .or. ( lUndoRelRdz ) )
+				fUpdateEnt( RD0->RD0_CODIGO , "SRA" , xFilial( "SRA" ) + GetMemVar( "RA_MAT" ) , nSraRdzOrd , cEmpAnt , cFilAnt )
+			EndIF
+			fUpdateRel(	RD0->RD0_CODIGO	,;	//RD0_CODIGO
+						cEmpAnt			,;	//Codigo da Empresa
+						cFilAnt			,;	//Codigo da Filial
+						NIL				,;	//Array com as Entidade para o Before Update
+						NIL				,;	//Array com as Entidades  para o Later Update
+						.T.				,;	//Se ira atualizar variaveis de memoria
+						"SRA"			 ;	//Alias das variaveis de memoria
+					  )
+		EndIF				  
+	EndIF
+	
+	RestArea( aAreaRd0 )
+	RestArea( aAreaSRA )
+	RestArea( aArea )
+	RestKeys( aSvKeys , .T. )
+
+CursorArrow()
+
+Return( lSraRelRd0 )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁSraShwRel 	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё05/02/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁAtualiza o SR9 com as Alteracoes efetuadas pelo RD0		    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>     								Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁNIL    														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>									Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function SraShwRel( nRd0Recno )
+
+Local cProcName3	:= Upper( AllTrim( ProcName( 3 ) ) )
+Local cProcName5	:= Upper( AllTrim( ProcName( 5 ) ) )
+
+Begin Sequence 
+
+	IF 	(;
+			!( "GPEA010MNT" $ ( cProcName3 + cProcName5 ) );
+			 .and.;
+			!( "TRM100ROT"  $ ( cProcName3 + cProcName5 ) );
+		)	
+		Break
+	EndIF
+
+	IF Empty( nRd0Recno )
+		IF ( EntExisteRel( "SRA" , xFilial("SRA")+GetMemVar( "RA_MAT" ) , cEmpAnt , cFilAnt , .T. ) )
+			nRd0Recno := RD0->( Recno() )
+		Else
+			nRd0Recno := 0
+		EndIF
+	EndIF
+	IF !Empty( nRd0Recno )
+		RD0->( MsGoto( nRd0Recno ) )
+		Apda020Vis( "RD0" , nRd0Recno , 2 )
+	Else
+		MsgInfo( OemToAnsi( STR0041 ) ) //"N└o existe relacionamento a ser visualizado."
+	EndIF
+
+End Sequence
+	
+Return( NIL )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁSraUpdtSr9	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё03/02/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁAtualiza o SR9 com as Alteracoes efetuadas pelo RD0		    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁSraUpdtSr9( cAlias , aSraFields )								Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                 	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁNIL    														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>									Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function SraUpdtSr9( cAlias , aSraFields )
+
+Local aArea		:= GetArea()
+Local aAreaAls	:= ( cAlias )->( GetArea() )
+
+Local nField
+Local nFields
+
+nFields := Len( aSraFields )
+For nField := 1 To nFields
+	fGravaSr9( aSraFields[ nField , 01 ] , aSraFields[ nField , 04 ] , aSraFields[ nField , 03 ] )
+Next nField
+
+RestArea( aAreaAls )
+RestArea( aArea )
+
+Return( NIL )
+
+/*/
+зддддддддддбдддддддддддбддддддбдддддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤┘o    ЁGp010AltSalЁAutor Ё Mauro Sergio          Ё Data Ё 22/04/96 Ё
+цддддддддддедддддддддддаддддддадддддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤┘o ЁConsistencia do Campo Tipo Alt. Salarial                    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>									Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGPEA010	                                                	Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gp010AltSal()
+
+Local lRet := .T. 
+     
+If (( IsMemVar( "RA_SALARIO" ) .and. GetMemVar( "RA_SALARIO" ) # SRA->RA_SALARIO) .OR.  ;
+    ( IsMemVar( "RA_CODFUNC" ) .and. GetMemVar( "RA_CODFUNC" ) # SRA->RA_CODFUNC) .OR.  ;
+ 	( IsMemVar( "RA_ANTEAUM" ) .and. GetMemVar( "RA_ANTEAUM" ) # SRA->RA_ANTEAUM .and. SR3->( Type("R3_ANTEAUM") ) # "U" ) .OR.  ;  
+	( IsMemVar( "RA_CARGO"   ) .and. GetMemVar( "RA_CARGO"   ) # SRA->RA_CARGO   .and. SR7->( Type("R7_CARGO")   ) # "U" ) )
+	
+	If ( GetMemVar( "RA_TIPOALT" ) == Space(3) .Or. Empty(GetMemVar( "RA_DATAALT" ) ) )
+	    Help("",1,"GPTIPOALT") 
+  		 lret := .F.
+  	Else
+		lRet	:=	PcoVldLan('000084','04','GPEA010')	
+  	Endif	 
+Endif
+Return( lRet )
+
+/*/
+зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤┘o    ЁfGravaSr3 Ё Autor Ё Mauro Sergio          Ё Data Ё 22/04/96 Ё
+цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤┘o ЁGravacao da Alteracao Salarial                              Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁfGravaSr3()                                                 Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGPEA010                                                     Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function fGravaSr3()
+Local cDescCar 		:= ""
+Local dRaDataAlt	:= GetMemVar( "RA_DATAALT" )
+Local lLock			:= .F.      
+Local cFun			:= ""
+
+//--Verifica se ja teve alguma alteracao salarial se nao grava a anterior como Primeira
+dbSelectArea("SR7")
+IF SR7->( !dbSeek(SRA->RA_FILIAL+SRA->RA_MAT) )
+
+	//-- monta data da alteracao como mes anterior da ultima
+    cMes := If (Month(dRaDataAlt) -1 > 0,StrZero(Month(dRaDataAlt)-1,2) , "12")
+    cAno := If (cMes = "12", StrZero(Year(dRaDataAlt)-1,4),StrZero(Year(dRaDataAlt),4) )
+
+    cFun := DescFun( SRA->RA_CODFUNC , SRA->RA_FILIAL )
+
+	If SQ3->( dbSeek(xFilial("SQ3")+SRA->RA_CARGO+SRA->RA_CC)) .or. SQ3->( dbSeek(xFilial("SQ3")+SRA->RA_CARGO))
+		cDescCar := SQ3->Q3_DESCSUM
+   	EndIf
+	//--grava o Salario anterior quando nao existir alteracao
+	dbSelectArea("SR7")
+	IF SR7->( RecLock("SR7",.T.,.T.) )
+		SR7->R7_FILIAL   := SRA->RA_FILIAL
+		SR7->R7_MAT      := SRA->RA_MAT
+		SR7->R7_DATA     := SRA->RA_ADMISSA
+		SR7->R7_TIPO     := "001"
+		SR7->R7_FUNCAO   := SRA->RA_CODFUNC
+		SR7->R7_DESCFUN  := cFun
+		SR7->R7_TIPOPGT  := SRA->RA_TIPOPGT
+		SR7->R7_CATFUNC  := SRA->RA_CATFUNC
+		SR7->R7_USUARIO  := STR0017  //"Sistema"
+	   	If SR7->( Type("R7_CARGO") ) # "U"
+		   	SR7->R7_CARGO   := SRA->RA_CARGO
+	   	EndIf
+		If SR7->( Type("R7_DESCCAR") ) # "U"
+			SR7->R7_DESCCAR	:= cDescCar
+		EndIf
+		If SR7->( Type("R7_SEQ") ) # "U"
+			SR7->R7_SEQ		:= "1"
+		EndIf
+
+		SR7->( MsUnLock() )
+		SR7->( FKCOMMIT() )
+	EndIF	
+
+	dbSelectArea("SR3")
+	IF RecLock("SR3",.T.,.T.)
+		SR3->R3_FILIAL   := SRA->RA_FILIAL
+		SR3->R3_MAT      := SRA->RA_MAT
+		SR3->R3_DATA     := SRA->RA_ADMISSA
+		SR3->R3_PD       := "000"
+		SR3->R3_DESCPD   := OemToAnsi(STR0018)  //"SALARIO BASE"
+		SR3->R3_VALOR    := SRA->RA_SALARIO
+		SR3->R3_TIPO     := "001"
+		If SR3->( Type("R3_ANTEAUM") ) # "U"
+			SR3->R3_ANTEAUM	:= SRA->RA_ANTEAUM
+		EndIf
+		If SR3->( Type("R3_SEQ") ) # "U"
+			SR3->R3_SEQ		:= "1"
+		EndIf
+
+		SR3->( MsUnLock() )
+	EndIF	
+
+EndIF
+
+//--gravacao da alteracao salarial atual
+cFun := DescFun(GetMemVar("RA_CODFUNC"),SRA->RA_FILIAL)
+If SQ3->( dbSeek(xFilial("SQ3")+M->RA_CARGO+M->RA_CC)) .or. SQ3->( dbSeek(xFilial("SQ3")+M->RA_CARGO))
+	cDescCar := SQ3->Q3_DESCSUM
+EndIf
+dbSelectArea("SR7")
+IF dbSeek(SRA->RA_FILIAL+SRA->RA_MAT+Dtos(dRaDataAlt)+GetMemVar("RA_TIPOALT") )
+	lLock := RecLock("SR7",.F.,.T.)
+Else
+	lLock := RecLock("SR7",.T.,.T.)
+Endif
+
+IF ( lLock )
+	SR7->R7_FILIAL   := SRA->RA_FILIAL
+	SR7->R7_MAT      := SRA->RA_MAT
+	SR7->R7_DATA     := dRaDataAlt
+	SR7->R7_TIPO     := GetMemVar("RA_TIPOALT")
+	SR7->R7_FUNCAO   := GetMemVar("RA_CODFUNC")
+	SR7->R7_DESCFUN  := cFun
+	SR7->R7_TIPOPGT  := GetMemVar("RA_TIPOPGT")
+	SR7->R7_CATFUNC  := GetMemVar("RA_CATFUNC")
+	SR7->R7_USUARIO  := SubStr(cUsuario,7,15)
+	If SR7->( Type("R7_CARGO") ) # "U"
+	   	SR7->R7_CARGO   := M->RA_CARGO
+	EndIf
+	If SR7->( Type("R7_DESCCAR") ) # "U"
+		SR7->R7_DESCCAR	:= cDescCar
+	EndIf
+	If SR7->( Type("R7_SEQ") ) # "U"
+		SR7->R7_SEQ		:= Alltrim(Str(Val(SR3->R3_SEQ)+1))
+	EndIf
+
+	SR7->( MsUnLock() )
+	SR7->( FKCOMMIT() )
+EndIF	
+
+IF ( lLock )
+
+	dbSelectArea("SR3")
+	IF dbSeek(SRA->RA_FILIAL+SRA->RA_MAT+Dtos(dRaDataAlt)+GetMemVar("RA_TIPOALT") )
+		lLock := RecLock("SR3",.F.,.T.)
+	Else
+		lLock := RecLock("SR3",.T.,.T.)
+	Endif
+	
+	IF ( lLock )
+
+		SR3->R3_FILIAL   := SRA->RA_FILIAL
+		SR3->R3_MAT      := SRA->RA_MAT
+		SR3->R3_DATA     := dRaDataAlt
+		SR3->R3_PD       := "000"
+		SR3->R3_DESCPD   := OemToAnsi(STR0018)  //"SALARIO BASE"
+		SR3->R3_VALOR    := GetMemVar("RA_SALARIO")
+		SR3->R3_TIPO     := GetMemVar("RA_TIPOALT")
+		If SR3->( Type("R3_ANTEAUM") ) # "U"
+			SR3->R3_ANTEAUM	:= GetMemVar("RA_ANTEAUM")
+		EndIf
+		If SR3->( Type("R3_SEQ") ) # "U"
+			SR3->R3_SEQ		:= SR7->R7_SEQ
+		EndIf
+
+		SR3->( MsUnLock() )
+		PcoDetLan('000084','04','GPEA010')	
+	EndIF
+
+EndIF		
+
+Return( NIL )
+
+/*/
+зддддддддддбддддддддддбдддддбддддддддддддддддддддддддддбдддддбдддддддддд©
+ЁFun┤┘o    ЁfGravaSr9 ЁAutorЁMauro Sergio        Ver.I ЁData Ё22/04/1996Ё
+Ё          Ё          Ё     ЁMarinaldo de Jesus  Ver.IIЁData Ё06/02/2004Ё
+цддддддддддеддддддддддадддддаддддддддддддддддддддддддддадддддадддддддддд╢
+ЁDescri┤┘o ЁGravacao da Alteracoes Cadastrais                           Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁfGravaSr9(cCampo)                                           Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                    Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function fGravaSr9( cCampo , uConteudo , uContAnt )
+
+Local lHist			:= .F.
+Local lSraLocked	:= IsLocked( "SRA" , SRA->( Recno() ) )
+Local lLock			:= .F.
+Local lSetCentury	:= __SetCentury("on")
+
+Local cValid
+Local cVldUser
+Local cContAnt
+Local cConteudo
+Local cTypeCnt1
+Local cTypeCnt2
+Local lAddNew
+
+Begin Sequence
+
+	cTypeCnt1 := ValType( uConteudo )
+	cTypeCnt2 := ValType( uContAnt  )
+	
+	IF !( cTypeCnt1 == cTypeCnt2 )
+		Break
+	EndIF
+
+	cCampo	:= Upper( AllTrim( cCampo ) )
+	cValid	:= GetSx3Cache( cCampo , "X3_VALID" )
+	IF !( lHist := ( cValid <> NIL .and. ( "FHIST" $ Upper( cValid ) ) ) )
+		cVldUser	:= GetSx3Cache( cCampo , "X3_VLDUSER"	)
+		IF !( lHist := ( cVldUser <> NIL .and. ( "FHIST" $ Upper( cVldUser ) ) ) )
+			Break
+		EndIF
+	EndIF
+
+	cPictCpo	:= Upper( AllTrim( GetSx3Cache( cCampo , "X3_PICTURE" ) ) )
+	cContAnt	:= AllTrim( AllToChar( uContAnt , cPictCpo ) )
+	cConteudo	:= AllTrim( AllToChar( uConteudo , cPictCpo ) )
+
+	IF !( lHist := cContAnt <> cConteudo )
+		Break
+	EndIF
+
+	//--Verifica se Houve alguma alteracao caso nao haja grava o anterior como primeira
+	IF ( cCampo == "RA_OCORREN" ) .or. !Empty( uContAnt )   //-so grava quando nao for vazio
+
+		lAddNew := SR9->( !dbSeek( SRA->( RA_FILIAL + RA_MAT ) + cCampo ) )
+
+		IF ( lAddNew )
+			cMes := IF( ( Month(dDataBase) -1 > 0 ) , StrZero( Month( dDataBase ) -1 , 2 ) , "12" )
+			cAno := IF( cMes == "12" , StrZero( Year( dDataBase ) - 1 , 4 ) , StrZero( Year( dDataBase ) , 4 ) )
+		    IF SR9->( RecLock( "SR9" , .T. , .T. ) )
+				SR9->R9_FILIAL   := SRA->RA_FILIAL
+				SR9->R9_MAT      := SRA->RA_MAT
+				SR9->R9_DATA     := Ctod("01/"+cMes+"/"+cAno,"ddmmyy")
+				SR9->R9_CAMPO    := cCampo
+				SR9->R9_DESC     := cContAnt
+				SR9->( MsUnLock() )
+			EndIF	
+		EndIF
+		
+	EndIF
+
+	//--gravacao da alteracao cadastral atual
+	lAddNew := !( SR9->( dbSeek( SRA->RA_FILIAL + SRA->RA_MAT + cCampo + Dtos( dDataBase ) ) ) )
+	IF SR9->( RecLock( "SR9" , lAddNew , .T. ) )
+		SR9->R9_FILIAL   := SRA->RA_FILIAL
+		SR9->R9_MAT      := SRA->RA_MAT
+		SR9->R9_DATA     := dDataBase
+		SR9->R9_CAMPO    := cCampo
+		SR9->R9_DESC     := cConteudo
+		SR9->( MsUnLock() )
+	EndIF	
+
+	IF !( lSraLocked )
+		lLock := SRA->( RecLock( "SRA" , .F. ) )
+	Else
+		lLock := lSraLocked
+	EndIF
+	
+	IF ( lLock )
+
+		//--Flega as Alteracoes correspondentes
+		IF ( cCampo $ "RA_NOME" )
+			SRA->RA_ALTNOME := "S"
+		ElseIF ( cCampo $ "RA_PIS" )
+			SRA->RA_ALTPIS := "S"
+		ElseIF ( cCampo $ "RA_NUMCP/RA_SERCP/RA_UFCP" )
+			SRA->RA_ALTCP := "S"
+		ElseIF ( cCampo $ "RA_BAIRRO/RA_MUNICIP/RA_ENDEREC/RA_COMPLEM/RA_ESTADO/RA_CEP" )
+			SRA->RA_ALTEND := "S"
+		ElseIF ( cCampo $ "RA_ADMISSA" )
+			SRA->RA_ALTADM := "S"
+		ElseIF ( cCampo $ "RA_OPCAO" )
+			SRA->RA_ALTOPC := "S"
+		EndIF
+		
+	EndIF		
+
+	IF !( lSraLocked )
+		SRA->( MsUnLock() )
+	EndIF
+
+End Sequence
+
+IF !( lSetCentury )
+	__SetCentury("off")
+EndIF
+
+Return( lHist )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁTestaAtf	  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё21/01/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁVerifica se O Modulo e o ATF          					    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁTestaAtf													Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGPEA010                                                  	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁlAtf   														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function TestaAtf()
+
+Local lAtf := ( cModulo == "ATF" ) 
+
+IF ( lAtf ) // Esta verificacao se deve ao fato de o GPEA010 ter saido no menu do modulo Ativo Fixo.
+	ApMsgAlert(OemToAnsi(STR0024)) //  "Esta rotina nao pode ser acessada pelo Modulo Ativo Fixo"
+EndIF
+
+Return( lAtf )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010SeqVld ЁAutorЁ Marinaldo de Jesus  Ё Data Ё17/10/2001Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁValidar a Sequencia digitada                                Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>									Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁPonto Eletronico                                            Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+Ё Retorno  ЁlRet 														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>									Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010SeqVld( lShowHelp , lVldTrcTurn )
+
+Local lRet	:= .T.
+
+Local cFil
+Local cVar
+Local cSeq
+Local cTno
+
+DEFAULT lShowHelp		:= .T.
+DEFAULT lVldTrcTurn		:= .F. 	
+
+IF ( IsMemVar( "RA_SEQTURN" ) .and. IsMemVar( "RA_TNOTRAB" ) )
+	cVar	:= ReadVar()
+	cSeq	:= IF( cVar == "M->RA_SEQTURN", &( cVar ) , GetMemVar("RA_SEQTURN") )
+	cTno	:= GetMemVar("RA_TNOTRAB")
+	cFil	:= xFilial( "SPJ" , xFilial("SRA") )
+	IF ( ( lVldTrcTurn ) .or. !Empty( cSeq ) )
+		lRet := SPJ->( MsSeek( cFil + cTno + cSeq , .F. ) )
+	EndIF
+	IF !( lRet )
+		IF ( lShowHelp )
+			Help( ' ' , 1 , 'SEQTURNINV' , , OemToAnsi( STR0025 ) , 1 , 0 ) //Sequencia Nao Cadastrada Para o Turno
+		EndIF
+	EndIF
+EndIF
+
+Return( lRet )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010SPFGrv ЁAutorЁ Marinaldo de Jesus  Ё Data Ё26/01/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁGrava Turno Inicial, Sequencia e Regra no Cadastro de TurnosЁ
+Ё          Ёde Trabalho                                                 Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>									Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGPEA010                                                     Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   Ё<void>														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>									Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010SPFGrv( cFil , cMat , dData , cTnoTrab , cSeqTurn , cRegra )
+
+IF !( SPF->( MsSeek( xFilial("SPF",cFil) + cMat , .F. ) ) )
+	IF SPF->( RecLock( "SPF" , .T. ) )
+		SPF->PF_FILIAL	:= xFilial( "SPF" , cFil )
+		SPF->PF_MAT		:= cMat
+		SPF->PF_DATA	:= dData
+		SPF->PF_TURNODE	:= cTnoTrab
+		SPF->PF_SEQUEDE := cSeqTurn
+		SPF->PF_REGRADE := cRegra
+		SPF->PF_TURNOPA	:= cTnoTrab
+		SPF->PF_SEQUEPA := cSeqTurn
+		SPF->PF_REGRAPA := cRegra
+		SPF->( MsUnLock() )
+	EndIF	
+EndIF
+	
+Return( NIL )
+
+/*/
+зддддддддддбддддддддддбдддддддбдддддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤┘o    ЁGPEA010VldЁ Autor Ё Bruno Sobieski        Ё Data Ё 17/12/02 Ё
+цддддддддддеддддддддддадддддддадддддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤┘o Ё Validacao de campos do SRA a traves do X3_VALID            Ё
+Ё          Ё                    										Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       Ё GPEA010                                                    Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function GPEA010Vld()
+
+Local lRet		:= .T.
+Local cVar		:= ReadVar()
+Local cConteudo := &( cVar )
+Local cValidos	:= ""
+
+IF (;
+		( cVar == "M->RA_CATFUNC" );
+		.and.;
+		( cPaisLoc <> "BRA" );
+	)	
+	IF ( cPaisLoc == "CHI" )
+		cValidos	:=	"AEGMT"
+	ElseIF ( cPaisLoc == "URU" )
+		cValidos	:=	"AEGHMT"
+	ElseIF ( cPaisLoc == "PAR" )
+		cValidos	:=	"AEGHMT"
+	ElseIF ( cPaisLoc == "DOM" )
+		cValidos	:=	"ADEGHMS"
+	ElseIf ( cPaisLoc == "ARG" )
+		cValidos	:=	"ADEGHMS
+	Else
+		cValidos	:=	"ACDEGHMST"
+	EndIF
+	IF !( lRet := ( cConteudo $ cValidos ) )
+		Help('',1,'GPEA010001')
+   EndIF
+EndIF
+If cVar == "M->RA_CARGO"                                          
+	lRet		:= 	Empty(cVar) .Or. SQ3->(DbSeek(xFilial("SQ3")+M->RA_CARGO+M->RA_CC))
+	If !lRet	
+		cValidos:=	fDesc("SQ3",M->RA_CARGO,"Q3_CC")
+		If !Empty(cValidos)
+			Aviso(OemToAnsi(STR0053),OemToAnsi(STR0013)+M->RA_CARGO+OemToAnsi(STR0014)+M->RA_CC+	;
+				  OemToAnsi(STR0015),{OemToAnsi(STR0001)},,OemToAnsi(STR0003))	
+				//"Atencao!" ### "Nao existe o Cargo " + RA_CARGO + " para o Centro de Custo " + RA_CC + ;
+				//". Informe Cargo Valido." ### "OK" ### "Cargo informado invalido."
+			lRet	:=	.F.
+		Else
+			lRet	:=	.T.
+		EndIf
+	Endif
+Endif
+
+Return( lRet )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁRaMsBlQlVld   ЁAutorЁ Marinaldo de Jesus  Ё Data Ё21/01/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁValid para o campo RA_MSBLQL								Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁRaMsBlQlVld()												Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁX3_VALID do campo RA_MSBLQL                                 Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁlRaMsBlQlVld												Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function RaMsBlQlVld()
+
+Local lRaMsBlQlVld := .T.
+
+Begin Sequence
+
+	IF !( lRaMsBlQlVld := Pertence( RaMsBlQlBox( .T. ) ) )
+		Break
+	EndIF
+
+End Sequence
+
+Return( lRaMsBlQlVld )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁRaMsBlQlInit  ЁAutorЁ Marinaldo de Jesus  Ё Data Ё21/01/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁInicializador Padrao para o campo RA_MSBLQL					Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁRaMsBlQlInit()												Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁX3_RELACAO do campo RA_MSBLQL                               Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   Ё"2"															Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function RaMsBlQlInit()
+Return( SubStr( RaMsBlQlBox( .T. ) , 2 , 1 ) )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁRaMsBlQlBox   ЁAutorЁ Marinaldo de Jesus  Ё Data Ё21/01/2004Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁOpcoes do cBox para o campo RA_MSBLQL					    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁRaMsBlQlInit()												Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁX3_CBOX do campo RA_MSBLQL                               	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁcOpcBox														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function RaMsBlQlBox( lValid , lRetDesc , cOpcDesc )
+
+Local cOpcBox
+
+DEFAULT lValid		:= .F.
+DEFAULT lRetDesc	:= .F.
+
+IF !( lValid )
+
+	IF !( lRetDesc )
+
+		cOpcBox := ( "1=" + STR0026 + ";" )	//"Nao"
+		cOpcBox += ( "2=" + STR0027		  )	//"Sim" 
+
+	Else
+
+		Do Case
+			Case ( cOpcDesc == "1" ) ; ( cOpcBox := STR0026 )	//"Nao"
+			Case ( cOpcDesc == "2" ) ; ( cOpcBox := STR0027 )	//"Sim" 
+		End Case
+
+	EndIF
+
+Else
+
+	cOpcBox := "12"
+
+EndIF
+
+Return( cOpcBox )
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010ValPE  ЁAutorЁ Ricardo Duarte CostaЁ Data Ё20/04/2005Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁValidacao ponto entrada de Inclusao/Alteracao de FuncionarioЁ
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁGpea010ValPE()												Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       Ё                                                         	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁlRet														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010ValPE()
+
+Local lRet	:= .T.
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Ponto de Entrada para checar os dados de inclusao/alteracao  |
+//Ё de funcionarios. O retorno deve ser logico (.T. ou .F.)      |
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If ExistBlock("Gp010ValPE")
+	lRet := ExecBlock("Gp010ValPE",.F.,.F.)
+Endif
+
+Return(lRet)
+
+
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010Excl   ЁAutorЁ Natie               Ё Data Ё03/06/2006Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁValidacao-Ponto entrada para validar exclusao de funcionar. Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁGpea010Excl     											Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       Ё                                                         	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁlRet														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010Excl()
+
+Local lRet	:= .T.
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Ponto de Entrada para validacao de Exclusao de Funcionarios  |
+//Ё O retorno deve ser logico (.T. ou .F.)                       |
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If ExistBlock("Gp010Exclu")
+	lRet := ExecBlock("Gp010Exclu",.F.,.F.)
+Endif
+
+Return(lRet)
+
+/*
+эээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠иммммммммммяммммммммммкмммммммяммммммммммммммммммммкммммммяммммммммммммм╩╠╠
+╠╠╨Programa  ЁGPEA010   ╨Autor  ЁMicrosiga           ╨ Data Ё  07/07/05   ╨╠╠
+╠╠лммммммммммьммммммммммймммммммоммммммммммммммммммммйммммммоммммммммммммм╧╠╠
+╠╠╨Desc.     Ё                                                            ╨╠╠
+╠╠╨          Ё                                                            ╨╠╠
+╠╠лммммммммммьмммммммммммммммммммммммммммммммммммммммммммммммммммммммммммм╧╠╠
+╠╠╨Uso       Ё AP                                                        ╨╠╠
+╠╠хммммммммммомммммммммммммммммммммммммммммммммммммммммммммммммммммммммммм╪╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+*/
+Static Function GP010Categ( cCateg )
+lRet := .T.
+
+If ALTERA
+	If cCateg == "A" .and. SRA->RA_CATFUNC # "A"
+		lRet := .F.
+		Aviso( OemToAnsi(STR0053), OemToAnsi(STR0027),{OemToAnsi(STR0001)},,OemToAnsi(STR0028))	
+		//"Atencao" ### "Nao e possivel alterar a Categoria deste funcionario para Autonomo." ### "OK" ### "Categoria incorreta"
+	EndIf	
+EndIf
+
+Return( lRet )
+
+
+/*
+эээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠иммммммммммяммммммммммкмммммммяммммммммммммммммммммкммммммяммммммммммммм╩╠╠
+╠╠╨Programa  ЁGPEA010   ╨Autor  ЁMicrosiga           ╨ Data Ё  07/07/05   ╨╠╠
+╠╠лммммммммммьммммммммммймммммммоммммммммммммммммммммйммммммоммммммммммммм╧╠╠
+╠╠╨Desc.     Ё                                                            ╨╠╠
+╠╠╨          Ё                                                            ╨╠╠
+╠╠лммммммммммьмммммммммммммммммммммммммммммммммммммммммммммммммммммммммммм╧╠╠
+╠╠╨Uso       Ё AP                                                         ╨╠╠
+╠╠хммммммммммомммммммммммммммммммммммммммммммммммммммммммммммммммммммммммм╪╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+*/
+Static function AltSX3()
+Local aArea 	:= GetArea()
+Local aAreaSxb	:= SXB->(GetArea()) 
+
+dbSelectArea("SX3")
+dbSetOrder(2)
+//зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Alterar a validacao do RA_CATFUNC para nao permitir       Ё
+//Ёque a categoria seja alterada para "A"( autonomo) quando o Ё
+//Ёfuncionario ja tiver sido cadastrado.                      Ё
+//юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If SX3->( dbSeek("RA_CATFUNC"))
+	If SX3->X3_VALID # 'EXISTCPO("SX5","28"+M->RA_CATFUNC).And.GPEA010Vld() .AND. GP010CATEG( M->RA_CATFUNC )'
+		RECLOCK( "SX3", .F.)
+		SX3->X3_VALID := 'EXISTCPO("SX5","28"+M->RA_CATFUNC).And.GPEA010Vld() .AND. GP010CATEG( M->RA_CATFUNC )'
+		SX3->( MsUnlock() )
+	EndIf
+EndIf
+
+//зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Alterar a validacao do RA_MAT para passar a M->RA_MAT na  Ё
+//Ё chamada da funcao ExistChav()                             Ё
+//юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If SX3->( dbSeek("RA_MAT"))
+	If At("Val(M->RA_MAT) > 0",SX3->X3_VALID) > 0
+		If SX3->X3_VALID # 'NaoVazio() .And. EXISTCHAV("SRA",M->RA_MAT) .And. Val(M->RA_MAT) > 0 .And. FreeForUse("SRA",M->RA_MAT)'
+			RECLOCK( "SX3", .F.)
+			SX3->X3_VALID := 'NaoVazio() .And. EXISTCHAV("SRA",M->RA_MAT) .And. Val(M->RA_MAT) > 0 .And. FreeForUse("SRA",M->RA_MAT)'
+			SX3->( MsUnlock() )
+		EndIf
+	Else
+		If SX3->X3_VALID # 'NaoVazio() .And. EXISTCHAV("SRA",M->RA_MAT) .And. FreeForUse("SRA",M->RA_MAT)'
+			RECLOCK( "SX3", .F.)
+			SX3->X3_VALID := 'NaoVazio() .And. EXISTCHAV("SRA",M->RA_MAT) .And. FreeForUse("SRA",M->RA_MAT)'
+			SX3->( MsUnlock() )
+		EndIf
+	Endif
+EndIf
+
+//зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Incluir a validacao do RA_DATAALT para nao permitir       Ё
+//Ёque a data de alteracao seja menor que a data da admissao. Ё
+//юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If SX3->( dbSeek("RA_DATAALT")) .And. Empty(SX3->X3_VALID)
+	RECLOCK( "SX3", .F.)
+		SX3->X3_VALID := 'RaDtAltVld()'
+	SX3->( MsUnlock() )
+EndIf
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Implementacao da Consulta Padrao: RB601 - Tabela+Nivel+Faixa Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If SX3->( dbSeek("RA_TABELA")) .And. AllTrim(SX3->X3_F3) !='RB601'
+	RecLock( "SX3", .F.)
+		SX3->X3_F3 := 'RB601'
+	SX3->( MsUnlock() )
+EndIf
+
+//зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//ЁAlterada Consulta Padrao para filtrar Centro de Custo do   Ё
+//ЁFuncionario. Ajuste no Valid tambem.                       Ё
+//юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If SX3->( dbSeek("RA_CARGO"))
+	If SX3->X3_F3 # "Q3S"
+		RECLOCK( "SX3", .F.)
+		SX3->X3_F3 := "Q3S"
+		SX3->( MsUnlock() )
+	EndIf
+	If SX3->X3_VALID # "GPEA010Vld()"
+		RECLOCK( "SX3", .F.)
+		SX3->X3_VALID := "GPEA010Vld()"
+		SX3->( MsUnlock() )
+	EndIf
+EndIf
+              
+If SX3->( dbSeek("RA_CBO")) 
+	If SX3->X3_VALID # "NaoVazio() .and. FHIST()"
+		RECLOCK( "SX3", .F.)
+		SX3->X3_VALID := "NaoVazio() .and. FHIST()"
+		SX3->( MsUnlock() )
+    EndIf
+EndIf                  
+
+If SX3->( dbSeek("RA_NASC")) 
+	If SX3->X3_VALID # "NaoVazio() .And. ChkDtNa(dDataBase,M->RA_NASC) .and. FHIST()"
+		RECLOCK( "SX3", .F.)
+		SX3->X3_VALID := "NaoVazio() .And. ChkDtNa(dDataBase,M->RA_NASC) .and. FHIST()"
+		SX3->( MsUnlock() )
+	EndIf	
+EndIf
+
+If cPaisLoc == "CHI" 
+	IF SX3->( dbSeek( "RA_CIC" ) )
+		IF !( Upper( AllTrim( SX3->X3_VALID ) ) == 'If(Empty(M->RA_CIC),.T.,LocBlock("VDRUT",.F.,.F.,{"M->RA_CIC",'+"'"+'XFILIAL("SRA")'+"'"+',ALIAS(),5})) .AND. FHIST()' )
+			SX3->( RecLock("SX3",.F.) )
+			SX3->X3_VALID := 'If(Empty(M->RA_CIC),.T.,LocBlock("VDRUT",.F.,.F.,{"M->RA_CIC",'+"'"+'XFILIAL("SRA")'+"'"+',ALIAS(),5})) .AND. FHIST()' 
+			SX3->( MsUnLock() )
+		EndIF
+	Endif
+Endif	
+//зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Alterar a picture do campo RA_TELEFON                     Ё
+//Ё(nao era possivel visualizar todos os numeros inseridos no Ё
+//Ёcampo                                                      Ё
+//юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If SX3->( dbSeek("RA_TELEFON"))
+	If ALLTRIM(SX3->X3_PICTURE)  == '@S15'
+		RECLOCK( "SX3", .F.)
+		SX3->X3_PICTURE := '@!'
+		SX3->( MsUnlock() )
+	EndIf
+EndIf
+
+If cPaisLoc == "ARG"
+	IF SX3->( dbSeek( "RA_CIC" ) )
+		IF !( Upper( AllTrim( SX3->X3_VALID ) ) == 'If(Empty(M->RA_CIC),.T.,CUIT() .AND. CHKCUIL(M->RA_CIC)) .AND. FHIST()' )
+			SX3->( RecLock("SX3",.F.) )
+			SX3->X3_VALID := 'If(Empty(M->RA_CIC),.T.,CUIT() .AND. CHKCUIL(M->RA_CIC)) .AND. FHIST()'  
+			SX3->( MsUnLock() )
+		EndIF
+	Endif
+	If SX3->( dbSeek("RA_ADTPOSE") )
+		If SX3->X3_RESERV <> "┌ю"
+			Reclock( "SX3", .F.)
+			X3_RESERV	:= "┌ю"
+			MsUnlock()
+		Endif	
+		If SX3->X3_VALID <> " "
+			Reclock( "SX3", .F.)
+			X3_VALID	:= " "
+			MsUnlock()
+		Endif	
+		If SX3->X3_WHEN <> "FATSERVICO()"
+			Reclock( "SX3", .F.)
+			X3_WHEN	:= "FATSERVICO()"
+			MsUnlock()
+		Endif	
+	EndIf
+Endif	
+
+dbSetOrder(1)
+//зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//ЁAjusta o SXB da consulta SRJ - Funcoes.                    Ё
+//юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+dbSelectArea("SXB")
+dbSetOrder(1)
+If dbseek("SRJ   30101")
+	If substr(SXB->XB_CONTEM,3,2) == "##"
+		RecLock( "SXB" , .F. )
+		SXB->XB_CONTEM	:= "01#GP030INC"
+		SXB->( MsUnlock() )
+	Endif
+Endif
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Implementacao do Filtro da Consulta Padrao: RB601 - Tabela+Nivel Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If !SXB->( dbSeek("RB601 601  ") )	
+	RecLock("SXB",.T.)   
+		SXB->XB_ALIAS  	:= 'RB601'
+		SXB->XB_TIPO	:= '6'
+		SXB->XB_SEQ		:= '01'
+		SXB->XB_CONTEM 	:= '@#GP010F3RB6()'
+	MsUnlock()
+EndIf
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Ajuste no filtro da consulta padrao Q3S                          Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If SXB->( dbSeek("Q3S   601  ") )	.And. XB_CONTEM != 'SQ3->Q3_CC==If(type("M->RA_CC")<> "U",M->RA_CC,SRA->RA_CC) .Or. Empty(SQ3->Q3_CC)'
+	RecLock("SXB",.F.)   
+		SXB->XB_CONTEM	:= 'SQ3->Q3_CC==If(type("M->RA_CC")<> "U",M->RA_CC,SRA->RA_CC) .Or. Empty(SQ3->Q3_CC)'
+	MsUnlock()
+Endif
+
+RestArea(aAreaSXB)
+
+
+RestArea(aArea) 
+
+Return
+
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    Ё RaDtAltVld   ЁAutorЁ Emerson Grassi RochaЁ Data Ё05/08/2005Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁValidacao do campo RA_DATAALT (Data de alteracao salarial)  Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   ЁRaDtAltVld()												Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       ЁGenerico                                                   	Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁRetorno   ЁlRet														Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<void>														Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function RaDtAltVld()
+
+Local lRet := .T.
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Nao permitir Dt. Alteracao Salarial menor que Dt.Admissao	 |
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If !Empty(M->RA_DATAALT) .And. M->RA_DATAALT < M->RA_ADMISSA
+	Aviso(OemToAnsi(STR0053), OemToAnsi(STR0056), {OemToAnsi(STR0001)})	//"Atencao!"###"A data da alteraГЦo salarial nЦo pode ser menor que a data de admissЦo." ### "OK"
+	lRet := .F.
+EndIf
+
+Return lRet
+
+/*/
+зддддддддддбддддддддддддддбдддддбдддддддддддддддддддддддддддддбддддддбдддддддддд©
+ЁFun┤└o    ЁGpea010FunVld ЁAutorЁ Eduardo Ju                  Ё Data Ё23/09/2005Ё
+цддддддддддеддддддддддддддадддддадддддддддддддддддддддддддддддаддддддадддддддддд╢
+ЁDescri┤└o ЁAtualizacao do Salario baseado na Faixa Salarial a partir da Funcao Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁSintaxe   Ё<vide parametros formais>							        		Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁUso       Ё                                                                    Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+Ё Retorno  ЁlRet 																Ё
+цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢
+ЁParametrosЁ<vide parametros formais>											Ё
+юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды/*/
+Static Function Gpea010FunVld(cCampo)
+
+Local cCargo 	:= SuperGetMv("MV_FUNCARG",NIL,"F") //   C - Atualiza o campo salario baseado na Faixa Salarial do cargo 
+                                                     //   F - Atualiza o campo salario baseado no salario - SRJ 
+Local nSalario	:= SRA->RA_SALARIO 
+
+
+//Parametro MV_FUNCARG
+//C  - Considera a Faixa Salarial e atualiza o campo Salario no Cadastro de Funcionarios com o Valor da Faixa Salarial
+//F  - Considera o Salario da Funcao e atualiza o campo Salario no Cadastro de Funcionarios 
+//"" - Nao considera nenhuma as situacoes anteriores
+//Lembrando que cAltSal == "S" atualiza as Informacoes da Funcao no Cadastro de Funcionarios
+
+If cAltSal = "S"   						//-- Somente deverА considerar o parametro MV_FUNCARG se o MV_ALTSAL estiver com  "S"
+	If cCargo == "C"  
+		If (cCampo == "F" .And. !Empty(SRJ->RJ_CARGO)) .Or. cCampo == "C"	//Cargo considerando Campo Funcao ou Cargo 
+			ConPad1( NIL , NIL , NIL , "RB601" , NIL , NIL , .F. )		
+			nSalario 		:= RB6->RB6_VALOR
+			M->RA_TABELA 	:= RB6->RB6_TABELA
+			M->RA_TABNIVE	:= RB6->RB6_NIVEL
+			M->RA_TABFAIX	:= RB6->RB6_FAIXA		
+		EndIf
+	ElseIf cCargo == "F" .or.  Empty(cCargo)  							//	Funcao
+		nSalario :=    SRJ->RJ_SALARIO
+		//nSalario := Iif( Inclui .Or. cAltSal = "S" , SRJ->RJ_SALARIO , SRA->RA_SALARIO ) 
+	Endif
+EndiF
+Return( nSalario ) 
+
+/*эээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠зддддддддддбдддддддддддбдддддддбддддддддддддддддддддддбддддддбдддддддддд©╠╠
+╠╠ЁFun┤┘o    ЁAcertSX7	 Ё Autor Ё Eduardo Ju           Ё Data Ё 23.09.05 Ё╠╠
+╠╠цддддддддддедддддддддддадддддддаддддддддддддддддддддддаддддддадддддддддд╢╠╠
+╠╠ЁDescri┤┘o ЁCriacao do Gatilho RA_CODFUNC007 e RA_CARGO002 no SX7.      Ё╠╠
+╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      ЁGPEA010                                                     Ё╠╠
+╠╠юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ*/
+Static Function AcertSX7()
+
+Local aArea := GetArea()
+Local cX7Regra := ""
+
+SX7->( dbSetOrder(1))
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Acerta gatilho para a descricao do cargo, somente quando RA_CARGO estiver preenchido.                      Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+IF SX7->( dbSeek("RA_CARGO  001") )
+	IF Upper( SX7->X7_REGRA ) # "RaCargoX7Regra()" .or. ; 
+   	   Upper( SX7->X7_CONDIC) # '!Empty(M->RA_CARGO)'
+		Reclock("SX7", .F.)                    
+		SX7->X7_CDOMIN	:= 'RA_DCARGO'
+		SX7->X7_REGRA	:=	"RaCargoX7Regra()"  
+		SX7->X7_TIPO	:= 'P'
+		SX7->X7_SEEK	:= 'S'
+		SX7->X7_ALIAS 	:= 'SQ3'
+		SX7->X7_ORDEM	:= 1
+		SX7->X7_CHAVE	:= 'xFilial("SQ3")+M->RA_CARGO'
+		SX7->X7_CONDIC	:= '!Empty(M->RA_CARGO)'
+		SX7->X7_PROPRI	:= 'S'
+		MsUnlock()
+	EndIf
+EndIf    
+
+IF SX7->( dbSeek('RA_CARGO  002') )
+	IF SX7->X7_PROPRI # "S"
+		Aviso( OemToAnsi(STR0053), OemToAnsi(STR0057) + "RA_CARGO/002" + OemToAnsi(STR0058), { "OK" } )		
+		// "Atencao!"###"Foi encontrado gatilho RA_CARGO/002 criado pelo usuario. Favor acertar a sequencia e executar a rotina novamente."
+	EndIF
+Else
+	Reclock( "SX7", .T.) 
+	SX7->X7_CAMPO	:= 'RA_CARGO'
+	SX7->X7_SEQUENC	:= '002'
+	SX7->X7_REGRA	:= 'GPEA010FUNVLD("C")'
+	SX7->X7_CDOMIN	:= 'RA_SALARIO'
+	SX7->X7_TIPO	:= 'P'
+	SX7->X7_SEEK	:= 'N'
+	SX7->X7_ORDEM	:= 0
+	SX7->X7_PROPRI	:= 'S'
+	MsUnlock()
+EndIf		 
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//ЁCondicao Valida somente na Inclusao. Caso a Funcao esteja vinculada a um cargo. Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+cX7Regra := "Iif( Inclui,M->RA_CARGO := SRJ->RJ_CARGO,M->RA_CARGO)"
+IF SX7->( dbSeek("RA_CODFUNC004") )
+	If Upper(SX7->X7_REGRA) <> cX7Regra
+		Reclock( "SX7", .F.)
+		SX7->X7_REGRA	:= cX7Regra	
+		SX7->X7_CDOMIN	:= 'RA_CARGO'
+		MsUnlock()
+	Endif
+Else 
+	Reclock( "SX7", .T.) 
+	SX7->X7_CAMPO	:= 'RA_CODFUNC'
+	SX7->X7_SEQUENC	:= '004'
+	SX7->X7_REGRA	:= cX7Regra
+	SX7->X7_CDOMIN	:= 'RA_CARGO'
+	SX7->X7_TIPO	:= 'P'
+	SX7->X7_SEEK	:= 'S'
+	SX7->X7_ALIAS 	:= 'SRJ' 
+	SX7->X7_ORDEM	:= 1
+	SX7->X7_CHAVE	:= 'xFilial("SRJ")+M->RA_CODFUNC'
+	SX7->X7_PROPRI	:= 'S'
+	MsUnlock()
+EndIf		 
+
+cX7Regra := "Iif( Inclui,M->RA_DCARGO := SQ3->Q3_DESCSUM,M->RA_DCARGO)"	
+IF SX7->( dbSeek("RA_CODFUNC005") )
+	If Upper(SX7->X7_REGRA) <> cX7Regra
+		Reclock( "SX7", .F.)
+		SX7->X7_REGRA	:= cX7Regra	
+		SX7->X7_CDOMIN	:= 'RA_DCARGO'
+		SX7->X7_TIPO	:= 'P'
+		SX7->X7_SEEK	:= 'S'
+		SX7->X7_ALIAS 	:= 'SQ3' 
+		SX7->X7_ORDEM	:= 1
+		SX7->X7_CHAVE	:= 'xFilial("SQ3")+M->RA_CARGO'
+		SX7->X7_PROPRI	:= 'S'	
+		MsUnlock()
+	Endif
+Else 
+	Reclock( "SX7", .T.) 
+	SX7->X7_CAMPO	:= 'RA_CODFUNC'
+	SX7->X7_SEQUENC	:= '005'
+	SX7->X7_REGRA	:= cX7Regra	
+	SX7->X7_CDOMIN	:= 'RA_DCARGO'
+	SX7->X7_TIPO	:= 'P'
+	SX7->X7_SEEK	:= 'S'
+	SX7->X7_ALIAS 	:= 'SQ3' 
+	SX7->X7_ORDEM	:= 1
+	SX7->X7_CHAVE	:= 'xFilial("SQ3")+M->RA_CARGO'
+	SX7->X7_PROPRI	:= 'S'	
+	MsUnlock()
+EndIf
+
+//здддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//Ё Quando o parametro Mv_AltSal = "N" esta sendo disparado o conteudo do campo RA_CODCBO porem ele И virtual, Ё
+//Ё tratar o campo RJ_CODCBO, pois o campo virtual busca este resgistro.                                       Ё
+//юдддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+If SX7->(dbSeek("RA_CODFUNC"+"006")) 
+	If Upper(SX7->X7_REGRA) <> "SRJ->RJ_CODCBO"
+		RECLOCK( "SX7", .F.)
+		SX7->X7_REGRA := "SRJ->RJ_CODCBO"
+		SX7->( MsUnlock() )
+	Endif 	
+Else 
+	Reclock( "SX7", .T.) 
+	SX7->X7_CAMPO	:= 'RA_CODFUNC'
+	SX7->X7_SEQUENC	:= '006'
+	SX7->X7_REGRA	:= 'SRJ->RJ_CODCBO'
+	SX7->X7_CDOMIN	:= 'RA_CODCBO'
+	SX7->X7_TIPO	:= 'P'
+	SX7->X7_SEEK	:= 'S'
+	SX7->X7_ALIAS 	:= 'SRJ' 
+	SX7->X7_ORDEM	:= 1
+	SX7->X7_CHAVE	:= 'xFilial("SRJ")+M->RA_CODFUNC'
+	SX7->X7_CONDIC	:= 'Left(cModulo,1)<>"Q"'
+	SX7->X7_PROPRI	:= 'S'
+EndIf
+
+IF SX7->( dbSeek('RA_CODFUNC007') )
+	IF SX7->X7_PROPRI # "S"
+		Aviso( OemToAnsi(STR0053), OemToAnsi(STR0057) + "RA_CODFUNC/007" + OemToAnsi(STR0058), { "OK" } )		
+		// "Atencao!"###"Foi encontrado gatilho RA_CODFUNC/007 criado pelo usuario. Favor acertar a sequencia e executar a rotina novamente."
+	EndIF	
+Else
+	Reclock( "SX7", .T.) 
+	SX7->X7_CAMPO	:= 'RA_CODFUNC'
+	SX7->X7_SEQUENC	:= '007'
+	SX7->X7_REGRA	:= 'GPEA010FUNVLD("F")'
+	SX7->X7_CDOMIN	:= 'RA_SALARIO'
+	SX7->X7_TIPO	:= 'P'
+	SX7->X7_SEEK	:= 'N'
+	SX7->X7_ORDEM	:= 0
+	SX7->X7_PROPRI	:= 'S'
+	MsUnlock()
+EndIf
+
+RestArea( aArea )
+
+Return Nil
+
+/*эээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠зддддддддддбдддддддддддбдддддддбддддддддддддддддддддддбддддддбдддддддддд©╠╠
+╠╠ЁFun┤┘o    ЁGP010F3RB6 Ё Autor Ё Eduardo Ju           Ё Data Ё 05.05.06 Ё╠╠
+╠╠цддддддддддедддддддддддадддддддаддддддддддддддддддддддаддддддадддддддддд╢╠╠
+╠╠ЁDescri┤┘o ЁCriacao do Filtro Tabela e Nivel para o Cargo.              Ё╠╠
+╠╠цддддддддддедддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      ЁGPEA010                                                     Ё╠╠
+╠╠юддддддддддадддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ*/
+Static Function GP010F3RB6()     
+
+Local uRet 		:= "@#"	
+Local cFunname 	:= ""
+
+cFunname := Upper(Alltrim(Funname()))
+
+If HTTPISAPW()
+   uRet := .T.	 // O retorno devera ser sempre .T. quando executado pela Web (TCF)
+EndIf   
+If ( cFunname == "TRMA100" .Or. cFunname == "GPEA010" .Or. cFunname == "GPEA011")
+	If !Empty(SQ3->Q3_TABELA+SQ3->Q3_TABNIVE)
+		uRet:= "@#RB6->RB6_TABELA+RB6->RB6_NIVEL == SQ3->Q3_TABELA+SQ3->Q3_TABNIVE@#"
+	Else
+		uRet:= "@#"
+	EndIf
+EndIf
+
+Return uRet 
+
+
+/*
+эээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠иммммммммммяммммммммммкмммммммяммммммммммммммммммммкммммммяммммммммммммм╩╠╠
+╠╠╨Programa  Ё fAltSxb  ╨Autor  ЁTania Bronzeri      ╨ Data Ё 18/05/2006  ╨╠╠
+╠╠лммммммммммьммммммммммймммммммоммммммммммммммммммммйммммммоммммммммммммм╧╠╠
+╠╠╨Desc.     ЁAjusta Consulta Padrao SXB                                  ╨╠╠
+╠╠хммммммммммомммммммммммммммммммммммммммммммммммммммммммммммммммммммммммм╪╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ
+*/
+Static Function fAltSxb()
+Local aArea := GetArea()
+
+dbSelectArea("SXB")
+SXB->( dbSetOrder(1))
+IF !(SXB->( dbSeek("SQ3   101DB") ))
+	Begin Transaction
+		Reclock( "SXB", .T.)
+		SXB->XB_ALIAS	:= "SQ3"
+		SXB->XB_TIPO	:= "1"
+		SXB->XB_SEQ		:= "01" 
+		SXB->XB_COLUNA	:= "DB"
+		SXB->XB_DESCRI	:= "Espec. de Cargos"
+		SXB->XB_CONTEM	:= "SQ3"
+		MsUnlock()
+		Reclock( "SXB", .T.)
+		SXB->XB_ALIAS	:= "SQ3"
+		SXB->XB_TIPO	:= "2"
+		SXB->XB_SEQ		:= "01" 
+		SXB->XB_COLUNA	:= "01"
+		SXB->XB_DESCRI	:= "Codigo"
+		MsUnlock()
+		Reclock( "SXB", .T.)
+		SXB->XB_ALIAS	:= "SQ3"
+		SXB->XB_TIPO	:= "3"
+		SXB->XB_SEQ		:= "01" 
+		SXB->XB_COLUNA	:= "01"
+		SXB->XB_DESCRI	:= "Cadastra Novo"
+		SXB->XB_CONTEM	:= "01"
+		MsUnlock()
+		Reclock( "SXB", .T.)
+		SXB->XB_ALIAS	:= "SQ3"
+		SXB->XB_TIPO	:= "4"
+		SXB->XB_SEQ		:= "01" 
+		SXB->XB_COLUNA	:= "01"
+		SXB->XB_DESCRI	:= "Cargo"
+		SXB->XB_CONTEM	:= "SQ3->Q3_CARGO"
+		MsUnlock()
+		Reclock( "SXB", .T.)
+		SXB->XB_ALIAS	:= "SQ3"
+		SXB->XB_TIPO	:= "4"
+		SXB->XB_SEQ		:= "01" 
+		SXB->XB_COLUNA	:= "02"
+		SXB->XB_DESCRI	:= "Descricao"
+		SXB->XB_CONTEM	:= "SQ3->Q3_DESCSUM"
+		MsUnlock()
+		Reclock( "SXB", .T.)
+		SXB->XB_ALIAS	:= "SQ3"
+		SXB->XB_TIPO	:= "4"
+		SXB->XB_SEQ		:= "01" 
+		SXB->XB_COLUNA	:= "03"
+		SXB->XB_DESCRI	:= "Centro de Custo"
+		SXB->XB_CONTEM	:= "SQ3->Q3_CC"
+		MsUnlock()
+		Reclock( "SXB", .T.)
+		SXB->XB_ALIAS	:= "SQ3"
+		SXB->XB_TIPO	:= "5"
+		SXB->XB_SEQ		:= "01" 
+		SXB->XB_CONTEM	:= "SQ3->Q3_CARGO"
+		MsUnlock()
+		Reclock( "SXB", .T.)
+		SXB->XB_ALIAS	:= "SQ3"
+		SXB->XB_TIPO	:= "5"
+		SXB->XB_SEQ		:= "02" 
+		SXB->XB_CONTEM	:= "SQ3->Q3_DESCSUM"
+		MsUnlock()
+		Reclock( "SXB", .T.)
+		SXB->XB_ALIAS	:= "SQ3"
+		SXB->XB_TIPO	:= "6"
+		SXB->XB_SEQ		:= "01" 
+		SXB->XB_CONTEM	:= 'SQ3->Q3_CC==If(type("M->RA_CC")<> "U",M->RA_CC,SRA->RA_CC) .Or. Empty(SQ3->Q3_CC)'
+		MsUnlock()
+	End Transaction
+EndIf		
+
+RestArea( aArea )
+
+Return
+
+
+/*
+ээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠зддддддддддбддддддддддддддбдддддддбддддддддддддддддддддддддддбддддддбдддддддддддд©╠╠
+╠╠ЁFun┤┘o    ЁRaCargoX7RegraЁ Autor Ё Tania Bronzeri           Ё Data Ё 19/05/2006 Ё╠╠
+╠╠цддддддддддеддддддддддддддадддддддаддддддддддддддддддддддддддаддддддадддддддддддд╢╠╠
+╠╠ЁDescri┤┘o ЁFuncao para carregar descricao do Cargo do Funcionario               Ё╠╠
+╠╠цддддддддддеддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд╢╠╠
+╠╠Ё Uso      ЁGPEA010                                                              Ё╠╠
+╠╠юддддддддддаддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ*/
+Static Function RaCargoX7Regra()     
+
+Local cFuncao 	:= M->RA_CODFUNC
+Local cCc		:= M->RA_CC                                               
+Local cCargo	:= M->RA_CARGO
+Local cCodCargo	:= Iif(Empty(cCargo),fDesc("SRJ",cFuncao,"RJ_CARGO"),cCargo)
+Local cDesCargo	:= fDesc("SQ3",cCodCargo+cCc,"Q3_DESCSUM")
+
+cDesCargo		:= If(Empty(cDesCargo),fDesc("SQ3",cCodCargo+space(05),"Q3_DESCSUM"),cDesCargo)
+
+Return (cDesCargo) 
+
+
+//зддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддд©
+//ЁImplementaГЦo para tratar a execuГЦo do valid do campo RA_MATЁ
+//Ёno confirmar do botЦo da tela da enchoice.                   Ё
+//юддддддддддддддддддддддддддддддддддддддддддддддддддддддддддддды
+Static Function Gpea010RunValid()
+Local aSalvaArea	:= GetArea()
+Local lRetorno		:= .F.
+Local nEncho		:= 1
+Local nPos			:= ASCAN(oenchsra:agets,{ |X| "RA_MAT"$X})	// Pesquisa a posicao do campo RA_MAT na enchoice
+
+nEncho	:= oEnchSra:Nctrl
+oEnchSra:aEntryCTRLS[nPos]:setFocus()
+
+dbSelectArea("SX3")
+dbSetOrder(2)
+If dbSeek("RA_MAT")
+	cExecMat	:= SX3->X3_VALID
+	lRetorno	:= &cExecMat
+Endif
+RestArea(aSalvaArea)
+oEnchSra:GOTOCTRL(nEncho)
+
+Return(lRetorno)
+
+
+/*
+эээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээээ
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+╠╠иммммммммммяммммммммммкмммммммяммммммммммммммммммммкммммммяммммммммммммм╩╠╠
+╠╠╨Programa  ЁfSraSenha ╨Autor  ЁMicrosiga           ╨ Data Ё  08/16/06   ╨╠╠
+╠╠лммммммммммьммммммммммймммммммоммммммммммммммммммммйммммммоммммммммммммм╧╠╠
+╠╠╨Desc.     ЁGravar a senha para o funcionario posicionado quando a mesma╨╠╠
+╠╠╨          Ёestiver vazia                                               ╨╠╠
+╠╠лммммммммммьмммммммммммммммммммммммммммммммммммммммммммммммммммммммммммм╧╠╠
+╠╠╨Uso       Ё GPEA010                                                    ╨╠╠
+╠╠хммммммммммомммммммммммммммммммммммммммммммммммммммммммммммммммммммммммм╪╠╠
+╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠╠
+ъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъъ*/
+Static Function FSraSenha()
+              
+	If cPaisLoc = 'BRA' .And. !(SRA->(Eof())) .And. Empty(SRA->RA_SENHA) .And. !Empty(SRA->RA_CIC)
+		RecLock("SRA",.F.)
+		SRA->RA_SENHA := RD0SX7PASS(SRA->RA_NASC,SRA->RA_ADMISSA,SRA->RA_CIC,SRA->RA_SENHA)  
+		MsUnlock()
+	Endif	
+	                         
+Return

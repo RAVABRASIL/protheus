@@ -1,0 +1,27 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "totvs_language_debug",
+			"request": "launch",
+			"name": "TOTVS Language Debug",
+			"program": "${command:AskForProgramName}",
+			"cwb": "${workspaceFolder}",
+			"smartclientBin": "D:\\TOTVS33\\Microsiga\\protheus\\smartclient\\smartclient.exe",
+			"isMultiSession": true,
+			"enableTableSync": true,
+			"enableMultiThread": true
+		}
+	],
+	"lastPrograms": [
+		{
+			"label": "sigamdi",
+			"description": "<nil>"
+		},
+		{
+			"label": "sigaadv",
+			"description": "<nil>"
+		}
+	],
+	"lastProgramExecuted": "sigaadv"
+}
