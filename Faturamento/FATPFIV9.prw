@@ -1516,7 +1516,7 @@ cQuery += "   UF, "
 for _X := 1 to Len(aMeses120)
    cQuery += "   "+aMeses120[_X,1]+" = SUM(CASE WHEN ANOMES = '"+aMeses120[_X,2]+"' THEN VENDIDO ELSE 0 END ), "
 next _X
-cQuery += "MESATUAL = ISNULL((SELECT "
+cQuery += "MESATUAL = ISNULL((SELECT " 
 if !lReal
    cQuery += "                   SUM(SC9U.C9_QTDLIB*SB1U.B1_PESO) "
 else   
