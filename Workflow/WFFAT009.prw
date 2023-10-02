@@ -153,7 +153,9 @@ if !AUUX->(EOF())
 	 
 	 oProcess:cTo += ";eronides.estevam@ravabrasil.com.br"
 	 
- 	 oProcess:cTo += ";antonio.ferreira@ravabrasil.com.br  "
+ 	//oProcess:cTo += ";antonio.ferreira@ravabrasil.com.br"
+
+	 oProcess:cTo += ";jhonatan.cavalcante@ravabrasil.com.br" // adicionado por Thiago Em 30-08-2023
 	 
 	 oProcess:cTo += ";roberta.gomes@ravaembalagens.com.br" //
      
